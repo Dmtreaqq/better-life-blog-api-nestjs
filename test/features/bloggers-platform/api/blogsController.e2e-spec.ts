@@ -4,7 +4,16 @@ import * as request from 'supertest';
 import { BloggersPlatformModule } from '../../../../src/features/bloggers-platform/bloggers-platform.module';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import { MongooseModule } from '@nestjs/mongoose';
-import { AppModule } from '../../../../src/app.module';
+import { API_PATH } from '../../../../src/common/config';
+import { CreateBlogInput } from '../../../../src/features/bloggers-platform/api/input-dto/create-blog.dto';
+import { Blog } from '../../../../src/features/bloggers-platform/domain/blog.entity';
+import { BlogsService } from '../../../../src/features/bloggers-platform/application/blogs.service';
+
+const blogInput: CreateBlogInput = {
+  name: 'Somebody Who',
+  description: 'Some description' + Math.floor(Math.random() * 5 + 1),
+  websiteUrl: 'https://somewebsite.com',
+};
 
 describe('Blogs Positive (e2e)', () => {
   let app: INestApplication;
@@ -32,18 +41,53 @@ describe('Blogs Positive (e2e)', () => {
     await mongoServer.stop();
   });
 
-  it('/blogs - get empty array when no blogs created', async () => {
-    return request(app.getHttpServer())
-      .get('/blogs')
-      .expect(HttpStatus.OK)
-      .then((response) => {
-        expect(response.body).toEqual({
-          items: [],
-          page: 1,
-          pageSize: 10,
-          pagesCount: 1,
-          totalCount: 0,
-        });
-      });
+  beforeEach(async () => {
+    await request(app.getHttpServer()).delete(API_PATH.TEST_DELETE);
   });
+
+  afterEach(async () => {
+    await request(app.getHttpServer()).delete(API_PATH.TEST_DELETE);
+  });
+
+  describe('/blogs positive', () => {
+    it('Should - get empty array when no blogs created', async () => {
+      return request(app.getHttpServer())
+        .get(API_PATH.BLOGS)
+        .expect(HttpStatus.OK)
+        .then((response) => {
+          expect(response.body).toEqual({
+            items: [],
+            page: 1,
+            pageSize: 10,
+            pagesCount: 1,
+            totalCount: 0,
+          });
+        });
+    });
+
+    it('should POST a blog successfully and GET', async () => {
+      const response = await request(app.getHttpServer())
+        .post(API_PATH.BLOGS)
+        .send(blogInput)
+        // .set('authorization', authHeader)
+        .expect(HttpStatus.CREATED);
+
+      expect(response.body).toEqual({
+        ...blogInput,
+        isMembership: false,
+        id: expect.any(String),
+        createdAt: expect.any(String),
+      });
+
+      const id = response.body.id;
+
+      const getResponse = await request(app.getHttpServer())
+        .get(`${API_PATH.BLOGS}/${id}`)
+        .expect(HttpStatus.OK);
+
+      expect(getResponse.body).toEqual({
+        ...response.body,
+      });
+    });
+  })
 });
