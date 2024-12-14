@@ -50,14 +50,12 @@ export class UsersQueryRepository {
       });
     }
 
-    const users = await this.UserModel.find({
-      ...filter,
-    })
+    const users = await this.UserModel.find(filter)
       .sort({ [query.sortBy]: query.sortDirection })
       .skip(query.calculateSkip())
       .limit(query.pageSize);
 
-    const totalCount = await this.UserModel.countDocuments({ ...filter });
+    const totalCount = await this.UserModel.countDocuments(filter);
 
     const items = users.map(UserViewDto.mapToView);
 
