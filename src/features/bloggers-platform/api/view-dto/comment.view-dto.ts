@@ -1,14 +1,22 @@
 import { CommentDocument } from '../../domain/comment.entity';
+import { ReactionStatus } from '../enums/ReactionStatus';
 
 class CommentatorInfo {
-  userId!: string;
-  userLogin!: string;
+  userId: string;
+  userLogin: string;
+}
+
+class LikesInfo {
+  likesCount: number;
+  dislikesCount: number;
+  myStatus: string;
 }
 
 export class CommentViewDto {
-  id!: string;
-  content!: string;
-  commentatorInfo!: CommentatorInfo;
+  id: string;
+  content: string;
+  commentatorInfo: CommentatorInfo;
+  likesInfo: LikesInfo;
   createdAt!: Date;
 
   static mapToView(comment: CommentDocument): CommentViewDto {
@@ -18,6 +26,11 @@ export class CommentViewDto {
     dto.commentatorInfo.userId = comment.commentatorId;
     dto.commentatorInfo.userLogin = comment.commentatorLogin;
     dto.createdAt = comment.createdAt;
+    dto.likesInfo = {
+      likesCount: 0,
+      dislikesCount: 0,
+      myStatus: ReactionStatus.None,
+    };
 
     return dto;
   }
