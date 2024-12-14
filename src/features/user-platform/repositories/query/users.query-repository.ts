@@ -18,7 +18,14 @@ export class UsersQueryRepository {
     const user = await this.UserModel.findById(id);
 
     if (!user) {
-      throw new NotFoundException('user not found');
+      throw new NotFoundException({
+        errorsMessages: [
+          {
+            message: 'User not found',
+            field: 'id',
+          },
+        ],
+      });
     }
 
     return UserViewDto.mapToView(user);

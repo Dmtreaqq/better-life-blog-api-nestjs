@@ -23,7 +23,14 @@ export class UsersRepository {
 
     if (!user) {
       //TODO: replace with domain exception
-      throw new NotFoundException('user not found');
+      throw new NotFoundException({
+        errorsMessages: [
+          {
+            message: 'User not found',
+            field: 'id',
+          },
+        ],
+      });
     }
 
     return user;
@@ -33,7 +40,14 @@ export class UsersRepository {
     const result = await user.deleteOne();
 
     if (result.deletedCount !== 1) {
-      throw new BadRequestException('Entity was not deleted for some reason');
+      throw new BadRequestException({
+        errorsMessages: [
+          {
+            message: 'Entity was not deleted for some reason',
+            field: 'id',
+          },
+        ],
+      });
     }
   }
 }

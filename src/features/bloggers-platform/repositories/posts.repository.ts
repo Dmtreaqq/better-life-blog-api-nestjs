@@ -18,7 +18,14 @@ export class PostsRepository {
     const post = await this.PostModel.findById(id);
 
     if (!post) {
-      throw new NotFoundException('Post not found');
+      throw new NotFoundException({
+        errorsMessages: [
+          {
+            message: 'Post not found',
+            field: 'id',
+          },
+        ],
+      });
     }
 
     return post;
@@ -28,7 +35,14 @@ export class PostsRepository {
     const result = await post.deleteOne();
 
     if (result.deletedCount !== 1) {
-      throw new BadRequestException('Entity was not deleted for some reason');
+      throw new BadRequestException({
+        errorsMessages: [
+          {
+            message: 'Entity was not deleted for some reason',
+            field: 'id',
+          },
+        ],
+      });
     }
   }
 }

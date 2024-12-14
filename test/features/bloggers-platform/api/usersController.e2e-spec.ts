@@ -88,5 +88,30 @@ describe('Users Positive (e2e)', () => {
         ...response.body,
       });
     });
+
+    it('should Delete a User and GET Not Found', async () => {
+      // Create user
+      const response = await request(app.getHttpServer())
+        .post(API_PATH.USERS)
+        .send(userInput)
+        // .set('authorization', authHeader)
+        .expect(HttpStatus.CREATED);
+
+      expect(response.body).toEqual({
+        login: userInput.login,
+        email: userInput.email,
+        id: expect.any(String),
+        createdAt: expect.any(String),
+      });
+      const id = response.body.id;
+
+      await request(app.getHttpServer())
+        .delete(`${API_PATH.USERS}/${id}`)
+        .expect(HttpStatus.NO_CONTENT);
+
+      await request(app.getHttpServer())
+        .get(`${API_PATH.USERS}/${id}`)
+        .expect(HttpStatus.NOT_FOUND);
+    });
   });
 });

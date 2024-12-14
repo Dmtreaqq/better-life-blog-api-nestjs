@@ -41,7 +41,14 @@ export class PostsQueryRepository {
     const post = await this.PostModel.findById(id);
 
     if (!post) {
-      throw new NotFoundException('Post not found');
+      throw new NotFoundException({
+        errorsMessages: [
+          {
+            message: 'User not found',
+            field: 'id',
+          },
+        ],
+      });
     }
 
     return PostViewDto.mapToView(post);
