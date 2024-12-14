@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { BloggersPlatformModule } from './features/bloggers-platform/bloggers-platform.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Connection } from 'mongoose';
+import { TestingModule } from './features/testing/testing.module';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { Connection } from 'mongoose';
         );
       },
     }),
+    TestingModule,
     BloggersPlatformModule,
   ],
   controllers: [],

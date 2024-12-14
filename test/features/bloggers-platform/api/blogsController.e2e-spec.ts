@@ -6,8 +6,6 @@ import { MongoMemoryServer } from 'mongodb-memory-server';
 import { MongooseModule } from '@nestjs/mongoose';
 import { API_PATH } from '../../../../src/common/config';
 import { CreateBlogInput } from '../../../../src/features/bloggers-platform/api/input-dto/create-blog.dto';
-import { Blog } from '../../../../src/features/bloggers-platform/domain/blog.entity';
-import { BlogsService } from '../../../../src/features/bloggers-platform/application/blogs.service';
 
 const blogInput: CreateBlogInput = {
   name: 'Somebody Who',
@@ -89,5 +87,5 @@ describe('Blogs Positive (e2e)', () => {
         ...response.body,
       });
     });
-  })
+  });
 });
