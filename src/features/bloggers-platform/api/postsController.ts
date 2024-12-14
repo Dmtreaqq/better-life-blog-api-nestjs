@@ -17,13 +17,24 @@ import { CreatePostInputDto } from './input-dto/create-post-input.dto';
 import { PostQueryGetParams } from './input-dto/get-posts-query.dto';
 import { BasePaginationViewDto } from '../../../common/dto/base-pagination.view-dto';
 import { UpdatePostInputDto } from './input-dto/update-post-input.dto';
+import { CommentsQueryRepository } from '../repositories/query/comments.query-repository';
+import { CommentsQueryGetParams } from './input-dto/get-comments-query.dto';
 
 @Controller('posts')
 export class PostsController {
   constructor(
     private postsQueryRepository: PostsQueryRepository,
     private postsService: PostsService,
+    private commentsQueryRepository: CommentsQueryRepository,
   ) {}
+
+  @Get(':postId/comments')
+  async getCommentsForPost(
+    @Param('postId') postId: string,
+    @Query() query: CommentsQueryGetParams,
+  ) {
+    return this.commentsQueryRepository.getAll(query, postId);
+  }
 
   @Get()
   async getAll(
