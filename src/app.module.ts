@@ -3,6 +3,7 @@ import { BloggersPlatformModule } from './features/bloggers-platform/bloggers-pl
 import { MongooseModule } from '@nestjs/mongoose';
 import { Connection } from 'mongoose';
 import { TestingModule } from './features/testing/testing.module';
+import { UserPlatformModule } from './features/user-platform/user-platform.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { TestingModule } from './features/testing/testing.module';
       },
     }),
     TestingModule,
+    UserPlatformModule,
     BloggersPlatformModule,
   ],
   controllers: [],

@@ -8,7 +8,7 @@ const urlRegex = new RegExp(
 
 @Schema({ timestamps: true })
 export class Blog {
-  @Prop({ type: String, maxlength: 15, required: true })
+  @Prop({ type: String, maxlength: 15, required: true, unique: true })
   name: string;
 
   @Prop({ type: String, maxlength: 500, required: true })

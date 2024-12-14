@@ -33,7 +33,10 @@ export class BlogsController {
   ) {}
 
   @Post(':id/posts')
-  async createPostForBlog(@Body() dto: Omit<CreatePostInputDto, 'blogId'>, @Param('id') blogId: string) {
+  async createPostForBlog(
+    @Body() dto: Omit<CreatePostInputDto, 'blogId'>,
+    @Param('id') blogId: string,
+  ) {
     const postId = await this.postsService.createPostForBlog(dto, blogId);
 
     return this.postsQueryRepository.getByIdOrThrow(postId);
