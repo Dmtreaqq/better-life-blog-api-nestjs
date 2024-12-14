@@ -57,7 +57,7 @@ export class UsersQueryRepository {
       .skip(query.calculateSkip())
       .limit(query.pageSize);
 
-    const totalCount = await this.UserModel.countDocuments(filter);
+    const totalCount = await this.UserModel.countDocuments({ ...filter });
 
     const items = users.map(UserViewDto.mapToView);
 
