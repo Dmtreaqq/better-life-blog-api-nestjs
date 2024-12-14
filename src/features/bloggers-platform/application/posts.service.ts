@@ -30,6 +30,25 @@ export class PostsService {
     return post.id;
   }
 
+  async createPostForBlog(
+    dto: Omit<CreatePostInputDto, 'blogId'>,
+    blogId: string,
+  ): Promise<string> {
+    const blog = await this.blogsRepository.getByIdOrThrow(blogId);
+
+    const post = this.PostModel.createInstance({
+      title: dto.title,
+      shortDescription: dto.shortDescription,
+      content: dto.content,
+      blogId: blog.id,
+      blogName: blog.name,
+    });
+
+    await this.postsRepository.save(post);
+
+    return post.id;
+  }
+
   async editPost(id: string, dto: UpdatePostInputDto) {
     const post = await this.postsRepository.getByIdOrThrow(id);
 
