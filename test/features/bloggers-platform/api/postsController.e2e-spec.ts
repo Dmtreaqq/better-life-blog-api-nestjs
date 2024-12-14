@@ -11,6 +11,9 @@ import { CreatePostInputDto } from '../../../../src/features/bloggers-platform/a
 import { BlogViewDto } from '../../../../src/features/bloggers-platform/api/view-dto/blog.view-dto';
 import { TestingModule as TestModule } from '../../../../src/features/testing/testing.module';
 import { PostViewDto } from '../../../../src/features/bloggers-platform/api/view-dto/post.view-dto';
+import { ReactionStatus } from '../../../../src/features/bloggers-platform/api/enums/ReactionStatus';
+import { API_PREFIX } from '../../../../src/settings/global-prefix.setup';
+import { appSetup } from '../../../../src/settings/app.setup';
 
 const blogInput: CreateBlogInput = {
   name: 'Somebody Who',
@@ -42,11 +45,7 @@ describe('Posts Positive (e2e)', () => {
     }).compile();
 
     app = moduleFixture.createNestApplication();
-    app.useGlobalPipes(
-      new ValidationPipe({
-        transform: true,
-      }),
-    );
+    appSetup(app);
     await app.init();
   });
 
@@ -56,13 +55,15 @@ describe('Posts Positive (e2e)', () => {
   });
 
   beforeEach(async () => {
-    await request(app.getHttpServer()).delete(API_PATH.TEST_DELETE);
+    await request(app.getHttpServer()).delete(
+      API_PREFIX + API_PATH.TEST_DELETE,
+    );
   });
 
   it('should POST a post successfully', async () => {
     // CREATE BLOG
     const createdBlogResponse = await request(app.getHttpServer())
-      .post(API_PATH.BLOGS)
+      .post(API_PREFIX + API_PATH.BLOGS)
       .send(blogInput)
       // .set('authorization', authHeader)
       .expect(HttpStatus.CREATED);
@@ -70,13 +71,19 @@ describe('Posts Positive (e2e)', () => {
 
     // CREATE POST
     const createdPostResponse = await request(app.getHttpServer())
-      .post(API_PATH.POSTS)
+      .post(API_PREFIX + API_PATH.POSTS)
       .send({ ...postInput, blogId: createdBlog.id })
       // .set('authorization', authHeader)
       .expect(HttpStatus.CREATED);
 
     expect(createdPostResponse.body).toEqual({
       ...postInput,
+      extendedLikesInfo: {
+        likesCount: 0,
+        dislikesCount: 0,
+        myStatus: ReactionStatus.None,
+        newestLikes: [],
+      },
       blogName: createdBlog.name,
       blogId: createdBlog.id,
       id: expect.any(String),
@@ -89,7 +96,7 @@ describe('Posts Positive (e2e)', () => {
     const randomObjectId = new ObjectId();
 
     await request(app.getHttpServer())
-      .post(API_PATH.POSTS)
+      .post(API_PREFIX + API_PATH.POSTS)
       .send({ ...postInput, blogId: randomObjectId })
       // .set('authorization', authHeader)
       .expect(HttpStatus.NOT_FOUND);
@@ -97,7 +104,7 @@ describe('Posts Positive (e2e)', () => {
 
   it('Should - get empty array when no posts created', async () => {
     return request(app.getHttpServer())
-      .get(API_PATH.POSTS)
+      .get(API_PREFIX + API_PATH.POSTS)
       .expect(HttpStatus.OK)
       .then((response) => {
         expect(response.body).toEqual({
@@ -112,7 +119,7 @@ describe('Posts Positive (e2e)', () => {
 
   it('should DELETE post successfully', async () => {
     const createdBlogResponse = await request(app.getHttpServer())
-      .post(API_PATH.BLOGS)
+      .post(API_PREFIX + API_PATH.BLOGS)
       .send(blogInput)
       // .set('authorization', authHeader)
       .expect(HttpStatus.CREATED);
@@ -120,7 +127,7 @@ describe('Posts Positive (e2e)', () => {
 
     // CREATE POST
     const createdPostResponse = await request(app.getHttpServer())
-      .post(API_PATH.POSTS)
+      .post(API_PREFIX + API_PATH.POSTS)
       .send({ ...postInput, blogId: createdBlog.id })
       // .set('authorization', authHeader)
       .expect(HttpStatus.CREATED);
@@ -128,12 +135,12 @@ describe('Posts Positive (e2e)', () => {
     const createdPost: PostViewDto = createdPostResponse.body;
 
     await request(app.getHttpServer())
-      .delete(`${API_PATH.POSTS}/${createdPost.id}`)
+      .delete(`${API_PREFIX + API_PATH.POSTS}/${createdPost.id}`)
       // .set('authorization', authHeader)
       .expect(HttpStatus.NO_CONTENT);
 
     await request(app.getHttpServer())
-      .get(`${API_PATH.POSTS}/${createdPost.id}`)
+      .get(`${API_PREFIX + API_PATH.POSTS}/${createdPost.id}`)
       .expect(HttpStatus.NOT_FOUND);
   });
 });

@@ -6,6 +6,8 @@ import { MongoMemoryServer } from 'mongodb-memory-server';
 import { MongooseModule } from '@nestjs/mongoose';
 import { API_PATH } from '../../../../src/common/config';
 import { CreateBlogInput } from '../../../../src/features/bloggers-platform/api/input-dto/create-blog.dto';
+import { API_PREFIX } from '../../../../src/settings/global-prefix.setup';
+import { appSetup } from '../../../../src/settings/app.setup';
 
 const blogInput: CreateBlogInput = {
   name: 'Somebody Who',
@@ -26,11 +28,8 @@ describe('Blogs Positive (e2e)', () => {
     }).compile();
 
     app = moduleFixture.createNestApplication();
-    app.useGlobalPipes(
-      new ValidationPipe({
-        transform: true,
-      }),
-    );
+    appSetup(app);
+
     await app.init();
   });
 
@@ -40,17 +39,17 @@ describe('Blogs Positive (e2e)', () => {
   });
 
   beforeEach(async () => {
-    await request(app.getHttpServer()).delete(API_PATH.TEST_DELETE);
+    await request(app.getHttpServer()).delete(API_PREFIX + API_PATH.TEST_DELETE);
   });
 
   afterEach(async () => {
-    await request(app.getHttpServer()).delete(API_PATH.TEST_DELETE);
+    await request(app.getHttpServer()).delete(API_PREFIX + API_PATH.TEST_DELETE);
   });
 
   describe('/blogs positive', () => {
     it('Should - get empty array when no blogs created', async () => {
       return request(app.getHttpServer())
-        .get(API_PATH.BLOGS)
+        .get(API_PREFIX + API_PATH.BLOGS)
         .expect(HttpStatus.OK)
         .then((response) => {
           expect(response.body).toEqual({
@@ -65,7 +64,7 @@ describe('Blogs Positive (e2e)', () => {
 
     it('should POST a blog successfully and GET', async () => {
       const response = await request(app.getHttpServer())
-        .post(API_PATH.BLOGS)
+        .post(API_PREFIX + API_PATH.BLOGS)
         .send(blogInput)
         // .set('authorization', authHeader)
         .expect(HttpStatus.CREATED);
@@ -80,7 +79,7 @@ describe('Blogs Positive (e2e)', () => {
       const id = response.body.id;
 
       const getResponse = await request(app.getHttpServer())
-        .get(`${API_PATH.BLOGS}/${id}`)
+        .get(`${API_PREFIX + API_PATH.BLOGS}/${id}`)
         .expect(HttpStatus.OK);
 
       expect(getResponse.body).toEqual({

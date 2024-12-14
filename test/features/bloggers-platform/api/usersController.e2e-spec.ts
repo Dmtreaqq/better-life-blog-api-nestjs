@@ -1,12 +1,13 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { HttpStatus, INestApplication, ValidationPipe } from '@nestjs/common';
 import * as request from 'supertest';
-import { BloggersPlatformModule } from '../../../../src/features/bloggers-platform/bloggers-platform.module';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import { MongooseModule } from '@nestjs/mongoose';
 import { API_PATH } from '../../../../src/common/config';
 import { CreateUserInputDto } from '../../../../src/features/user-platform/api/input-dto/users.input-dto';
 import { UserPlatformModule } from '../../../../src/features/user-platform/user-platform.module';
+import { API_PREFIX } from '../../../../src/settings/global-prefix.setup';
+import { appSetup } from '../../../../src/settings/app.setup';
 
 const userInput: CreateUserInputDto = {
   login: 'login6',
@@ -27,11 +28,7 @@ describe('Users Positive (e2e)', () => {
     }).compile();
 
     app = moduleFixture.createNestApplication();
-    app.useGlobalPipes(
-      new ValidationPipe({
-        transform: true,
-      }),
-    );
+    appSetup(app);
     await app.init();
   });
 
@@ -41,17 +38,21 @@ describe('Users Positive (e2e)', () => {
   });
 
   beforeEach(async () => {
-    await request(app.getHttpServer()).delete(API_PATH.TEST_DELETE);
+    await request(app.getHttpServer()).delete(
+      API_PREFIX + API_PATH.TEST_DELETE,
+    );
   });
 
   afterEach(async () => {
-    await request(app.getHttpServer()).delete(API_PATH.TEST_DELETE);
+    await request(app.getHttpServer()).delete(
+      API_PREFIX + API_PATH.TEST_DELETE,
+    );
   });
 
   describe('/users positive', () => {
     it('Should - get empty array when no users created', async () => {
       return request(app.getHttpServer())
-        .get(API_PATH.USERS)
+        .get(API_PREFIX + API_PATH.USERS)
         .expect(HttpStatus.OK)
         .then((response) => {
           expect(response.body).toEqual({
@@ -66,7 +67,7 @@ describe('Users Positive (e2e)', () => {
 
     it('should POST a User successfully and GET', async () => {
       const response = await request(app.getHttpServer())
-        .post(API_PATH.USERS)
+        .post(API_PREFIX + API_PATH.USERS)
         .send(userInput)
         // .set('authorization', authHeader)
         .expect(HttpStatus.CREATED);
@@ -81,7 +82,7 @@ describe('Users Positive (e2e)', () => {
       const id = response.body.id;
 
       const getResponse = await request(app.getHttpServer())
-        .get(`${API_PATH.USERS}/${id}`)
+        .get(`${API_PREFIX + API_PATH.USERS}/${id}`)
         .expect(HttpStatus.OK);
 
       expect(getResponse.body).toEqual({
@@ -92,7 +93,7 @@ describe('Users Positive (e2e)', () => {
     it('should Delete a User and GET Not Found', async () => {
       // Create user
       const response = await request(app.getHttpServer())
-        .post(API_PATH.USERS)
+        .post(API_PREFIX + API_PATH.USERS)
         .send(userInput)
         // .set('authorization', authHeader)
         .expect(HttpStatus.CREATED);
@@ -106,11 +107,11 @@ describe('Users Positive (e2e)', () => {
       const id = response.body.id;
 
       await request(app.getHttpServer())
-        .delete(`${API_PATH.USERS}/${id}`)
+        .delete(`${API_PREFIX + API_PATH.USERS}/${id}`)
         .expect(HttpStatus.NO_CONTENT);
 
       await request(app.getHttpServer())
-        .get(`${API_PATH.USERS}/${id}`)
+        .get(`${API_PREFIX + API_PATH.USERS}/${id}`)
         .expect(HttpStatus.NOT_FOUND);
     });
   });

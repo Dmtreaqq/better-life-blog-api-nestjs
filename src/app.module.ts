@@ -7,7 +7,9 @@ import { UserPlatformModule } from './features/user-platform/user-platform.modul
 
 @Module({
   imports: [
-    MongooseModule.forRoot('mongodb://localhost:27017/?retryWrites=true', {
+    // mongodb://localhost:27017/?retryWrites=true
+    // mongodb+srv://${String(process.env.MONGO_USERNAME)}:${String(process.env.MONGO_PASSWORD)}@cluster0.klsta.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
+    MongooseModule.forRoot(`mongodb://localhost:27017/?retryWrites=true`, {
       dbName: 'better-life-blog-nest',
       onConnectionCreate: (connection: Connection) => {
         connection.on('connected', () =>
