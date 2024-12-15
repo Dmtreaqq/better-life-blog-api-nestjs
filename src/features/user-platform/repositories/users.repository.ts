@@ -23,14 +23,12 @@ export class UsersRepository {
 
     if (!user) {
       //TODO: replace with domain exception
-      throw new NotFoundException({
-        errorsMessages: [
-          {
-            message: 'User not found',
-            field: 'id',
-          },
-        ],
-      });
+      throw new NotFoundException([
+        {
+          message: 'User not found',
+          field: 'id',
+        },
+      ]);
     }
 
     return user;

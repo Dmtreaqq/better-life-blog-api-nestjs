@@ -18,14 +18,12 @@ export class PostsRepository {
     const post = await this.PostModel.findById(id);
 
     if (!post) {
-      throw new NotFoundException({
-        errorsMessages: [
-          {
-            message: 'Post not found',
-            field: 'id',
-          },
-        ],
-      });
+      throw new NotFoundException([
+        {
+          message: 'Post not found',
+          field: 'id',
+        },
+      ]);
     }
 
     return post;

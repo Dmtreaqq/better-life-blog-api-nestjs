@@ -22,14 +22,12 @@ export class PostsQueryRepository {
     if (isValidObjectId(blogId)) {
       const blog = await this.BlogModel.findById(blogId);
       if (!blog) {
-        throw new NotFoundException({
-          errorsMessages: [
-            {
-              message: 'Blog not found while get post',
-              field: 'blogId',
-            },
-          ],
-        });
+        throw new NotFoundException([
+          {
+            message: 'Blog not found while get posts',
+            field: 'blogId',
+          },
+        ]);
       }
     }
 
@@ -59,14 +57,12 @@ export class PostsQueryRepository {
     const post = await this.PostModel.findById(id);
 
     if (!post) {
-      throw new NotFoundException({
-        errorsMessages: [
-          {
-            message: 'User not found',
-            field: 'id',
-          },
-        ],
-      });
+      throw new NotFoundException([
+        {
+          message: 'User not found',
+          field: 'id',
+        },
+      ]);
     }
 
     return PostViewDto.mapToView(post);
