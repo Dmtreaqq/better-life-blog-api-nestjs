@@ -91,7 +91,7 @@ describe('Posts Positive (e2e)', () => {
     });
   });
 
-  it('should return 404 when try to create post for not existing blog', async () => {
+  it('should return 400 when try to create post for not existing blog', async () => {
     // CREATE POST
     const randomObjectId = new ObjectId();
 
@@ -99,7 +99,7 @@ describe('Posts Positive (e2e)', () => {
       .post(API_PREFIX + API_PATH.POSTS)
       .send({ ...postInput, blogId: randomObjectId })
       // .set('authorization', authHeader)
-      .expect(HttpStatus.NOT_FOUND);
+      .expect(HttpStatus.BAD_REQUEST);
   });
 
   it('Should - get empty array when no posts created', async () => {

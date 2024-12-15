@@ -1,13 +1,13 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { HttpStatus, INestApplication, ValidationPipe } from '@nestjs/common';
 import * as request from 'supertest';
-import { BloggersPlatformModule } from '../../../../src/features/bloggers-platform/bloggers-platform.module';
+import { BloggersPlatformModule } from '../../../src/features/bloggers-platform/bloggers-platform.module';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import { MongooseModule } from '@nestjs/mongoose';
-import { API_PATH } from '../../../../src/common/config';
-import { CreateBlogInput } from '../../../../src/features/bloggers-platform/api/input-dto/create-blog.dto';
-import { API_PREFIX } from '../../../../src/settings/global-prefix.setup';
-import { appSetup } from '../../../../src/settings/app.setup';
+import { API_PATH } from '../../../src/common/config';
+import { CreateBlogInput } from '../../../src/features/bloggers-platform/api/input-dto/create-blog.dto';
+import { API_PREFIX } from '../../../src/settings/global-prefix.setup';
+import { appSetup } from '../../../src/settings/app.setup';
 
 const blogInput: CreateBlogInput = {
   name: 'Somebody Who',
@@ -39,11 +39,15 @@ describe('Blogs Positive (e2e)', () => {
   });
 
   beforeEach(async () => {
-    await request(app.getHttpServer()).delete(API_PREFIX + API_PATH.TEST_DELETE);
+    await request(app.getHttpServer()).delete(
+      API_PREFIX + API_PATH.TEST_DELETE,
+    );
   });
 
   afterEach(async () => {
-    await request(app.getHttpServer()).delete(API_PREFIX + API_PATH.TEST_DELETE);
+    await request(app.getHttpServer()).delete(
+      API_PREFIX + API_PATH.TEST_DELETE,
+    );
   });
 
   describe('/blogs positive', () => {

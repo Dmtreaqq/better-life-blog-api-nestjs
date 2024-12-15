@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreatePostInputDto } from '../api/input-dto/create-post-input.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Post, PostModelType } from '../domain/post.entity';
@@ -15,8 +15,15 @@ export class PostsService {
   ) {}
 
   async createPost(dto: CreatePostInputDto): Promise<string> {
-    // TODO: throw 400 if no blog from DTO
-    const blog = await this.blogsRepository.getByIdOrThrow(dto.blogId);
+    const blog = await this.blogsRepository.getById(dto.blogId);
+    if (!blog) {
+      throw new BadRequestException([
+        {
+          message: 'Blog not found',
+          field: 'blogId',
+        },
+      ]);
+    }
 
     const post = this.PostModel.createInstance({
       title: dto.title,
@@ -35,7 +42,15 @@ export class PostsService {
     dto: Omit<CreatePostInputDto, 'blogId'>,
     blogId: string,
   ): Promise<string> {
-    const blog = await this.blogsRepository.getByIdOrThrow(blogId);
+    const blog = await this.blogsRepository.getById(blogId);
+    if (!blog) {
+      throw new BadRequestException([
+        {
+          message: 'Blog not found',
+          field: 'blogId',
+        },
+      ]);
+    }
 
     const post = this.PostModel.createInstance({
       title: dto.title,

@@ -14,18 +14,20 @@ export class BlogsRepository {
     await blog.save();
   }
 
+  async getById(id: string): Promise<BlogDocument | null> {
+    return this.BlogModel.findById(id);
+  }
+
   async getByIdOrThrow(id: string): Promise<BlogDocument> {
     const blog = await this.BlogModel.findById(id);
 
     if (!blog) {
-      throw new NotFoundException({
-        errorsMessages: [
-          {
-            message: 'Blog not found',
-            field: 'id',
-          },
-        ],
-      });
+      throw new NotFoundException([
+        {
+          message: 'Blog not found',
+          field: 'id',
+        },
+      ]);
     }
 
     return blog;
@@ -35,14 +37,12 @@ export class BlogsRepository {
     const result = await blog.deleteOne();
 
     if (result.deletedCount !== 1) {
-      throw new BadRequestException({
-        errorsMessages: [
-          {
-            message: 'Entity was not deleted for some reason',
-            field: 'id',
-          },
-        ],
-      });
+      throw new BadRequestException([
+        {
+          message: 'Entity was not deleted for some reason',
+          field: 'id',
+        },
+      ]);
     }
   }
 }

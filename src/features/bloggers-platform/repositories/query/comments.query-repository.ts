@@ -41,14 +41,12 @@ export class CommentsQueryRepository {
     const comment = await this.CommentModel.findById(id);
 
     if (!comment) {
-      throw new BadRequestException({
-        errorsMessages: [
-          {
-            message: 'Comment not found',
-            field: 'id',
-          },
-        ],
-      });
+      throw new BadRequestException([
+        {
+          message: 'Comment not found',
+          field: 'id',
+        },
+      ]);
     }
 
     return CommentViewDto.mapToView(comment);

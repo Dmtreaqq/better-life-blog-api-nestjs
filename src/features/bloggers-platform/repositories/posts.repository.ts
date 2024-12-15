@@ -35,14 +35,12 @@ export class PostsRepository {
     const result = await post.deleteOne();
 
     if (result.deletedCount !== 1) {
-      throw new BadRequestException({
-        errorsMessages: [
-          {
-            message: 'Entity was not deleted for some reason',
-            field: 'id',
-          },
-        ],
-      });
+      throw new BadRequestException([
+        {
+          message: 'Entity was not deleted for some reason',
+          field: 'id',
+        },
+      ]);
     }
   }
 }
