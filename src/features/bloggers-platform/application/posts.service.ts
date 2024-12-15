@@ -15,6 +15,7 @@ export class PostsService {
   ) {}
 
   async createPost(dto: CreatePostInputDto): Promise<string> {
+    // TODO: throw 400 if no blog from DTO
     const blog = await this.blogsRepository.getByIdOrThrow(dto.blogId);
 
     const post = this.PostModel.createInstance({

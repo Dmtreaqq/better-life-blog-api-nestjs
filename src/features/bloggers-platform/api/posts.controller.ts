@@ -19,6 +19,7 @@ import { BasePaginationViewDto } from '../../../common/dto/base-pagination.view-
 import { UpdatePostInputDto } from './input-dto/update-post-input.dto';
 import { CommentsQueryRepository } from '../repositories/query/comments.query-repository';
 import { CommentsQueryGetParams } from './input-dto/get-comments-query.dto';
+import { IdInputDto } from '../../../common/dto/id.input-dto';
 
 @Controller('posts')
 export class PostsController {
@@ -30,10 +31,10 @@ export class PostsController {
 
   @Get(':postId/comments')
   async getCommentsForPost(
-    @Param('postId') postId: string,
+    @Param() params: IdInputDto,
     @Query() query: CommentsQueryGetParams,
   ) {
-    return this.commentsQueryRepository.getAll(query, postId);
+    return this.commentsQueryRepository.getAll(query, params.id);
   }
 
   @Get()
@@ -44,8 +45,8 @@ export class PostsController {
   }
 
   @Get(':id')
-  async getById(@Param('id') id: string): Promise<PostViewDto> {
-    return this.postsQueryRepository.getByIdOrThrow(id);
+  async getById(@Param() params: IdInputDto): Promise<PostViewDto> {
+    return this.postsQueryRepository.getByIdOrThrow(params.id);
   }
 
   @Post()
@@ -57,13 +58,13 @@ export class PostsController {
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  async deleteById(@Param('id') id: string) {
-    await this.postsService.deletePost(id);
+  async deleteById(@Param() params: IdInputDto) {
+    await this.postsService.deletePost(params.id);
   }
 
   @Put(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  async editPost(@Param('id') id: string, @Body() dto: UpdatePostInputDto) {
-    return this.postsService.editPost(id, dto);
+  async editPost(@Param() params: IdInputDto, @Body() dto: UpdatePostInputDto) {
+    return this.postsService.editPost(params.id, dto);
   }
 }
