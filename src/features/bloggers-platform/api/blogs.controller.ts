@@ -22,6 +22,7 @@ import { PostsQueryRepository } from '../repositories/query/posts.query-reposito
 import { PostQueryGetParams } from './input-dto/get-posts-query.dto';
 import { PostsService } from '../application/posts.service';
 import { CreatePostInputDto } from './input-dto/create-post-input.dto';
+import { IdInputDto } from '../../../common/dto/id.input-dto';
 
 @Controller('blogs')
 export class BlogsController {
@@ -35,9 +36,9 @@ export class BlogsController {
   @Post(':id/posts')
   async createPostForBlog(
     @Body() dto: Omit<CreatePostInputDto, 'blogId'>,
-    @Param('id') blogId: string,
+    @Param() param: IdInputDto,
   ) {
-    const postId = await this.postsService.createPostForBlog(dto, blogId);
+    const postId = await this.postsService.createPostForBlog(dto, param.id);
 
     return this.postsQueryRepository.getByIdOrThrow(postId);
   }
@@ -45,9 +46,9 @@ export class BlogsController {
   @Get(':id/posts')
   async getPostsForBlog(
     @Query() query: PostQueryGetParams,
-    @Param('id') blogId: string,
+    @Param() params: IdInputDto,
   ) {
-    return this.postsQueryRepository.getAll(query, blogId);
+    return this.postsQueryRepository.getAll(query, params.id);
   }
 
   @Post()
@@ -65,19 +66,19 @@ export class BlogsController {
   }
 
   @Get(':id')
-  async getById(@Param('id') id: string) {
-    return this.blogsQueryRepository.getByIdOrThrow(id);
+  async getById(@Param() params: IdInputDto) {
+    return this.blogsQueryRepository.getByIdOrThrow(params.id);
   }
 
   @Put(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  async editBlog(@Param('id') id: string, @Body() dto: UpdateBlogInput) {
-    return this.blogsService.editBlog(id, dto);
+  async editBlog(@Param() params: IdInputDto, @Body() dto: UpdateBlogInput) {
+    return this.blogsService.editBlog(params.id, dto);
   }
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  async deleteById(@Param('id') id: string) {
-    await this.blogsService.deleteBlog(id);
+  async deleteById(@Param() params: IdInputDto) {
+    await this.blogsService.deleteBlog(params.id);
   }
 }
