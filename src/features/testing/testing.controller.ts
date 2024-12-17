@@ -18,8 +18,8 @@ export class TestingController {
   @Delete('all-data')
   @HttpCode(HttpStatus.NO_CONTENT)
   async deleteAll() {
-    await this.BlogModel.deleteMany();
-    await this.PostModel.deleteMany();
-    await this.UserModel.deleteMany();
+    await this.BlogModel.deleteMany({});
+    await this.PostModel.deleteMany({});
+    await this.UserModel.deleteMany({});
   }
 }

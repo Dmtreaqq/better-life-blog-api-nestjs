@@ -1,15 +1,15 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { HttpStatus, INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
-import { BloggersPlatformModule } from '../../../src/features/bloggers-platform/bloggers-platform.module';
+import { BloggersPlatformModule } from '../../../../src/features/bloggers-platform/bloggers-platform.module';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import { MongooseModule } from '@nestjs/mongoose';
-import { API_PATH } from '../../../src/common/config';
-import { API_PREFIX } from '../../../src/settings/global-prefix.setup';
-import { appSetup } from '../../../src/settings/app.setup';
-import { BlogsTestManager } from '../../helpers/blogs-test-manager';
-import { UpdateBlogInput } from '../../../src/features/bloggers-platform/api/input-dto/update-blog.dto';
-import { CreatePostInputDto } from '../../../src/features/bloggers-platform/api/input-dto/create-post-input.dto';
+import { API_PATH } from '../../../../src/common/config';
+import { API_PREFIX } from '../../../../src/settings/global-prefix.setup';
+import { appSetup } from '../../../../src/settings/app.setup';
+import { BlogsTestManager } from '../../../helpers/blogs-test-manager';
+import { UpdateBlogInput } from '../../../../src/features/bloggers-platform/api/input-dto/update-blog.dto';
+import { CreatePostInputDto } from '../../../../src/features/bloggers-platform/api/input-dto/create-post-input.dto';
 
 describe('Blogs Positive (e2e)', () => {
   let app: INestApplication;
