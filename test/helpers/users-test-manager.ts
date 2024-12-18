@@ -1,9 +1,13 @@
 import { HttpStatus, INestApplication } from '@nestjs/common';
-import request from 'supertest';
-import { CreateUserInputDto } from '../../src/features/user-platform/api/input-dto/users.input-dto';
-import { UserViewDto } from '../../src/features/user-platform/api/view-dto/users.view-dto';
+import * as request from 'supertest';
+import { CreateUserInputDto } from '../../src/features/user-platform/api/input-dto/create-user.input-dto';
+import {
+  MeViewDto,
+  UserViewDto,
+} from '../../src/features/user-platform/api/view-dto/users.view-dto';
 import { API_PREFIX } from '../../src/settings/global-prefix.setup';
-import { UpdateUserInputDto } from '../../src/features/user-platform/api/input-dto/update-user.input-dto';
+import { delay } from 'rxjs';
+import { API_PATH } from '../../src/common/config';
 
 export class UsersTestManager {
   constructor(private app: INestApplication) {}
@@ -13,22 +17,8 @@ export class UsersTestManager {
     statusCode: number = HttpStatus.CREATED,
   ): Promise<UserViewDto> {
     const response = await request(this.app.getHttpServer())
-      .post(`/${GLOBAL_PREFIX}/users`)
+      .post(`${API_PREFIX}${API_PATH.USERS}`)
       .send(createModel)
-      .auth('admin', 'qwerty')
-      .expect(statusCode);
-
-    return response.body;
-  }
-
-  async updateUser(
-    userId: string,
-    updateModel: UpdateUserInputDto,
-    statusCode: number = HttpStatus.NO_CONTENT,
-  ): Promise<UserViewDto> {
-    const response = await request(this.app.getHttpServer())
-      .put(`/${GLOBAL_PREFIX}/users/${userId}`)
-      .send(updateModel)
       .auth('admin', 'qwerty')
       .expect(statusCode);
 
@@ -41,7 +31,7 @@ export class UsersTestManager {
     statusCode: number = HttpStatus.OK,
   ): Promise<{ accessToken: string }> {
     const response = await request(this.app.getHttpServer())
-      .post(`/${GLOBAL_PREFIX}/auth/login`)
+      .post(`/${API_PREFIX}/auth/login`)
       .send({ login, password })
       .expect(statusCode);
 
@@ -55,7 +45,7 @@ export class UsersTestManager {
     statusCode: number = HttpStatus.OK,
   ): Promise<MeViewDto> {
     const response = await request(this.app.getHttpServer())
-      .get(`/${GLOBAL_PREFIX}/auth/me`)
+      .get(`/${API_PREFIX}/auth/me`)
       .auth(accessToken, { type: 'bearer' })
       .expect(statusCode);
 

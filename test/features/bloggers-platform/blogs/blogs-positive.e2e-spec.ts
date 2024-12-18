@@ -10,6 +10,7 @@ import { appSetup } from '../../../../src/settings/app.setup';
 import { BlogsTestManager } from '../../../helpers/blogs-test-manager';
 import { UpdateBlogInput } from '../../../../src/features/bloggers-platform/api/input-dto/update-blog.dto';
 import { CreatePostInputDto } from '../../../../src/features/bloggers-platform/api/input-dto/create-post-input.dto';
+import { TestingModule as TestModule } from '../../../../src/features/testing/testing.module';
 
 describe('Blogs Positive (e2e)', () => {
   let app: INestApplication;
@@ -20,8 +21,9 @@ describe('Blogs Positive (e2e)', () => {
     mongoServer = await MongoMemoryServer.create();
     const mongoUri = mongoServer.getUri();
 
+    // TODO: добавить Test Module
     const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [BloggersPlatformModule, MongooseModule.forRoot(mongoUri)],
+      imports: [TestModule, MongooseModule.forRoot(mongoUri)],
     }).compile();
 
     app = moduleFixture.createNestApplication();

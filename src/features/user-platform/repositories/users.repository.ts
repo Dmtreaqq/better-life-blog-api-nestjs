@@ -5,6 +5,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import { Document } from 'mongoose';
 
 @Injectable()
 export class UsersRepository {
@@ -14,11 +15,19 @@ export class UsersRepository {
     return this.UserModel.findById(id);
   }
 
+  async findByLoginOrEmail(login: string, email: string): Promise<any | null> {
+    const userWithEmail = await this.UserModel.findOne({
+      $or: [{ email }, { login }],
+    });
+
+    return userWithEmail || null;
+  }
+
   async save(user: UserDocument) {
     await user.save();
   }
 
-  async findOrNotFoundFail(id: string): Promise<UserDocument> {
+  async getByIdOrThrow(id: string): Promise<UserDocument> {
     const user = await this.findById(id);
 
     if (!user) {

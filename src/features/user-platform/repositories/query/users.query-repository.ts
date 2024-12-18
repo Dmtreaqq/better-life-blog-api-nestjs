@@ -14,7 +14,7 @@ export class UsersQueryRepository {
     private UserModel: UserModelType,
   ) {}
 
-  async getByIdOrNotFoundFail(id: string): Promise<UserViewDto> {
+  async getByIdOrThrow(id: string): Promise<UserViewDto> {
     const user = await this.UserModel.findById(id);
 
     if (!user) {

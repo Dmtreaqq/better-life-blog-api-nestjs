@@ -11,6 +11,7 @@ export class BlogsRepository {
   constructor(@InjectModel('Blog') private BlogModel: BlogModelType) {}
 
   async save(blog: BlogDocument) {
+    // TODO: спросить откуда появляется blog.id, в єтом месте?
     await blog.save();
   }
 

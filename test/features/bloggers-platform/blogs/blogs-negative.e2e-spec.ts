@@ -10,6 +10,7 @@ import { appSetup } from '../../../../src/settings/app.setup';
 import { BlogsTestManager } from '../../../helpers/blogs-test-manager';
 import { ObjectId } from 'mongodb';
 import { createBlogInput } from '../../../helpers/inputs';
+import { TestingModule as TestModule } from '../../../../src/features/testing/testing.module';
 
 describe('Blogs Negative (e2e)', () => {
   let app: INestApplication;
@@ -22,7 +23,7 @@ describe('Blogs Negative (e2e)', () => {
     const mongoUri = mongoServer.getUri();
 
     const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [BloggersPlatformModule, MongooseModule.forRoot(mongoUri)],
+      imports: [TestModule, MongooseModule.forRoot(mongoUri)],
     }).compile();
 
     app = moduleFixture.createNestApplication();

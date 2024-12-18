@@ -26,7 +26,6 @@ describe('Posts Positive (e2e)', () => {
 
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [
-        BloggersPlatformModule,
         TestModule,
         MongooseModule.forRoot(mongoUri),
       ],

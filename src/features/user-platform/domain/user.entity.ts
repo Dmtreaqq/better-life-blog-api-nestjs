@@ -2,61 +2,48 @@ import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Model } from 'mongoose';
 import { CreateUserDto } from '../dto/create-user.dto';
 
-/**
- * User Entity Schema
- * This class represents the schema and behavior of a User entity.
- */
+const emailRegex = new RegExp('^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$');
+const loginRegex = new RegExp('^[a-zA-Z0-9_-]*$');
+
 @Schema({ timestamps: true })
 export class User {
-  /**
-   * Login of the user (must be uniq)
-   * @type {string}
-   * @required
-   */
-  @Prop({ type: String, required: true })
+  @Prop({
+    type: String,
+    match: loginRegex,
+    minlength: 3,
+    maxlength: 10,
+    required: true,
+  })
   login: string;
 
-  /**
-   * Password hash for authentication
-   * @type {string}
-   * @required
-   */
   @Prop({ type: String, required: true })
-  passwordHash: string;
+  password: string;
 
-  /**
-   * Email of the user
-   * @type {string}
-   * @required
-   */
-  @Prop({ type: String, required: true })
+  @Prop({ type: String, match: emailRegex, maxlength: 50, required: true })
   email: string;
 
-  /**
-   * Email confirmation status (if not confirmed in 2 days account will be deleted)
-   * @type {boolean}
-   * @default false
-   */
-  @Prop({ type: Boolean, required: true, default: false })
-  isEmailConfirmed: boolean;
+  @Prop({ type: Boolean, default: true })
+  isConfirmed: boolean;
 
-  /**
-   * Creation timestamp
-   * Explicitly defined despite timestamps: true
-   * @type {Date}
-   */
+  @Prop({ type: String, default: '0' })
+  confirmationCode: string;
+
+  @Prop({ type: String, default: new Date().toISOString() })
+  confirmationCodeExpirationDate: string;
+
+  @Prop({ type: String, default: '0' })
+  recoveryCode: string;
+
+  @Prop({ type: String, default: new Date().toISOString() })
+  recoveryCodeExpirationDate: string;
+
   @Prop({ type: Date })
   createdAt: Date;
 
-  /**
-   * Factory method to create a User instance
-   * @param {CreateUserDto} dto - The data transfer object for user creation
-   * @returns {UserDocument} The created user document
-   */
   static createInstance(dto: CreateUserDto): UserDocument {
     const user = new this();
     user.email = dto.email;
-    user.passwordHash = dto.password;
+    user.password = dto.password;
     user.login = dto.login;
 
     return user as UserDocument;
