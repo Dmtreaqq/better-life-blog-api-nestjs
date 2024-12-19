@@ -8,6 +8,7 @@ import {
   Param,
   Post,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { UsersQueryRepository } from '../repositories/query/users.query-repository';
 import { UserViewDto } from './view-dto/users.view-dto';
@@ -16,6 +17,7 @@ import { CreateUserInputDto } from './input-dto/create-user.input-dto';
 import { BasePaginationViewDto } from '../../../common/dto/base-pagination.view-dto';
 import { ApiParam } from '@nestjs/swagger';
 import { GetUsersQueryParams } from './input-dto/get-users-query-params.input-dto';
+import { BasicAuthGuard } from '../../../common/guards/basic-auth.guard';
 
 @Controller('users')
 export class UsersController {
@@ -24,11 +26,13 @@ export class UsersController {
     private usersService: UsersService,
   ) {}
 
+  @UseGuards(BasicAuthGuard)
   @Get(':id')
   async getById(@Param('id') id: string): Promise<UserViewDto> {
     return this.usersQueryRepository.getByIdOrThrow(id);
   }
 
+  @UseGuards(BasicAuthGuard)
   @Get()
   async getAll(
     @Query() query: GetUsersQueryParams,
@@ -36,6 +40,7 @@ export class UsersController {
     return this.usersQueryRepository.getAll(query);
   }
 
+  @UseGuards(BasicAuthGuard)
   @Post()
   async createUser(@Body() body: CreateUserInputDto): Promise<UserViewDto> {
     const userId = await this.usersService.createUser(body);
@@ -44,6 +49,7 @@ export class UsersController {
   }
 
   @ApiParam({ name: 'id' }) //для сваггера
+  @UseGuards(BasicAuthGuard)
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   async deleteUser(@Param('id') id: string): Promise<void> {
