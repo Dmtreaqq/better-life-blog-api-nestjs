@@ -13,6 +13,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { User, UserModelType } from '../domain/user.entity';
 import { add } from 'date-fns/add';
 import { ConfirmationCodeDto } from '../api/input-dto/confirmation-code.dto';
+import { EmailService } from '../../communication/email.service';
 
 @Injectable()
 export class AuthService {
@@ -22,6 +23,7 @@ export class AuthService {
     private usersRepository: UsersRepository,
     private cryptoService: CryptoService,
     private jwtService: JwtService,
+    private emailService: EmailService,
   ) {}
 
   async login(userId: string) {
@@ -66,7 +68,9 @@ export class AuthService {
 
     await this.usersRepository.save(user);
 
-    // TODO: SEND EMAIl with EMAIL SERVICE
+    this.emailService
+      .sendConfirmationEmail(user.confirmationCode, dto.email)
+      .catch((e) => console.log(e));
   }
 
   async confirmRegistration(dto: ConfirmationCodeDto) {

@@ -45,6 +45,10 @@ export class User {
     user.email = dto.email;
     user.password = dto.password;
     user.login = dto.login;
+    user.confirmationCode = dto.confirmationCode;
+    user.isConfirmed = dto.isConfirmed;
+    user.recoveryCode = dto.recoveryCode;
+    user.recoveryCodeExpirationDate = dto.recoveryCodeExpirationDate;
 
     return user as UserDocument;
   }

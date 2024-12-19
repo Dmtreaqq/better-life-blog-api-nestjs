@@ -15,12 +15,8 @@ export class UsersRepository {
     return this.UserModel.findById(id);
   }
 
-  async findByConfirmationCode(code: string): Promise<UserDocument> {
-    return this.UserModel.findOne({
-      where: {
-        code,
-      },
-    });
+  async findByConfirmationCode(code: string): Promise<UserDocument | null> {
+    return this.UserModel.findOne({ confirmationCode: code });
   }
 
   async findByLoginOrEmail(
