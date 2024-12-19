@@ -30,7 +30,7 @@ export class MeViewDto extends OmitType(UserViewDto, [
 
     dto.email = user.email;
     dto.login = user.login;
-    dto.userId = user._id.toString();
+    dto.userId = user.id;
 
     return dto;
   }

@@ -10,11 +10,17 @@ import { AuthService } from './application/auth.service';
 import { PassportModule } from '@nestjs/passport';
 import { LocalStrategy } from './api/guards/local.strategy';
 import { AuthController } from './api/auth.controller';
+import { JwtModule } from '@nestjs/jwt';
+import * as process from 'node:process';
 
 // TODO: спросить почему мьі добавили паспорт модуль
 @Module({
   imports: [
     PassportModule,
+    JwtModule.register({
+      secret: process.env.JWT_SECRET || 'secret',
+      signOptions: { expiresIn: '7m' },
+    }),
     MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
   ],
   controllers: [UsersController, AuthController],
