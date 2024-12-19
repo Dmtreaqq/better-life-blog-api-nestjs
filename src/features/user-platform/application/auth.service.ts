@@ -14,6 +14,7 @@ import { User, UserModelType } from '../domain/user.entity';
 import { add } from 'date-fns/add';
 import { ConfirmationCodeDto } from '../api/input-dto/confirmation-code.dto';
 import { EmailService } from '../../communication/email.service';
+import { ResendConfirmEmailDto } from '../api/input-dto/resend-confirm-email.dto';
 
 @Injectable()
 export class AuthService {
@@ -114,6 +115,31 @@ export class AuthService {
     user.isConfirmed = true;
 
     await this.usersRepository.save(user);
+  }
+
+  async resendConfirmRegistration(dto: ResendConfirmEmailDto) {
+    const user = await this.usersRepository.findByEmail(dto.email);
+    if (!user) {
+      throw new BadRequestException([
+        {
+          message: 'Invalid email',
+          field: 'email',
+        },
+      ]);
+    }
+
+    if (user.isConfirmed === true) {
+      throw new BadRequestException([
+        {
+          message: 'Email already confirmed',
+          field: 'email',
+        },
+      ]);
+    }
+
+    this.emailService
+      .sendConfirmationEmail(user.confirmationCode, dto.email)
+      .catch((e) => console.log(e));
   }
 
   async validateUser(loginOrEmail: string, password: string): Promise<any> {

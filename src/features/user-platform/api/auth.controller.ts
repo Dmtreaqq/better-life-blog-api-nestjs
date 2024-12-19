@@ -17,6 +17,7 @@ import { MeViewDto } from './view-dto/users.view-dto';
 import { UserDocument } from '../domain/user.entity';
 import { RegistrationUserDto } from './input-dto/registration-user.dto';
 import { ConfirmationCodeDto } from './input-dto/confirmation-code.dto';
+import { ResendConfirmEmailDto } from './input-dto/resend-confirm-email.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -42,6 +43,12 @@ export class AuthController {
   @Post('registration-confirmation')
   async confirmRegistration(@Body() dto: ConfirmationCodeDto) {
     await this.authService.confirmRegistration(dto);
+  }
+
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @Post('registration-email-resending')
+  async resendConfirmRegistration(@Body() dto: ResendConfirmEmailDto) {
+    await this.authService.resendConfirmRegistration(dto);
   }
 
   @UseGuards(JwtAuthGuard)

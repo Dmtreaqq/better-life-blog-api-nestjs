@@ -30,12 +30,8 @@ export class UsersRepository {
     return userWithEmail || null;
   }
 
-  async findByLogin(login: string): Promise<UserDocument> {
-    return this.UserModel.findOne({
-      where: {
-        login,
-      },
-    });
+  async findByEmail(email: string): Promise<UserDocument | null> {
+    return this.UserModel.findOne({ email });
   }
 
   async save(user: UserDocument) {
