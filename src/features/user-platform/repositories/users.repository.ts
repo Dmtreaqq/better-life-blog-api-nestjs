@@ -11,8 +11,16 @@ import { Document } from 'mongoose';
 export class UsersRepository {
   constructor(@InjectModel(User.name) private UserModel: UserModelType) {}
 
-  async findById(id: string): Promise<UserDocument | null> {
+  async findById(id: string): Promise<UserDocument> {
     return this.UserModel.findById(id);
+  }
+
+  async findByConfirmationCode(code: string): Promise<UserDocument> {
+    return this.UserModel.findOne({
+      where: {
+        code,
+      },
+    });
   }
 
   async findByLoginOrEmail(
