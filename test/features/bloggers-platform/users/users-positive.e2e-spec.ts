@@ -7,7 +7,7 @@ import * as request from 'supertest';
 import { API_PREFIX } from '../../../../src/settings/global-prefix.setup';
 import { API_PATH } from '../../../../src/common/config';
 import { TestingModule as TestModule } from '../../../../src/features/testing/testing.module';
-import { UsersTestManager } from '../../../helpers/users-test-manager';
+import { basicAuthHeader, UsersTestManager } from '../../../helpers/users-test-manager';
 import { createUserInput } from '../../../helpers/inputs';
 
 describe('Users Positive (e2e)', () => {
@@ -51,7 +51,7 @@ describe('Users Positive (e2e)', () => {
     const response = await request(app.getHttpServer())
       .post(API_PREFIX + API_PATH.USERS)
       .send(createUserInput)
-      // .set('authorization', authHeader)
+      .set('authorization', basicAuthHeader)
       .expect(HttpStatus.CREATED);
 
     expect(response.body).toEqual({
@@ -63,7 +63,7 @@ describe('Users Positive (e2e)', () => {
 
     await request(app.getHttpServer())
       .get(`${API_PREFIX}${API_PATH.USERS}/${response.body.id}`)
-      // .set('authorization', authHeader)
+      .set('authorization', basicAuthHeader)
       .expect(HttpStatus.OK, response.body);
   });
 
@@ -76,12 +76,12 @@ describe('Users Positive (e2e)', () => {
 
     await request(app.getHttpServer())
       .del(`${API_PREFIX}${API_PATH.USERS}/${user.id}`)
-      // .set('authorization', authHeader)
+      .set('authorization', basicAuthHeader)
       .expect(HttpStatus.NO_CONTENT);
 
     await request(app.getHttpServer())
       .get(`${API_PREFIX}${API_PATH.USERS}/${user.id}`)
-      // .set('authorization', authHeader)
+      .set('authorization', basicAuthHeader)
       .expect(HttpStatus.NOT_FOUND);
   });
 
@@ -90,7 +90,7 @@ describe('Users Positive (e2e)', () => {
 
     const response1 = await request(app.getHttpServer())
       .get(`${API_PREFIX}${API_PATH.USERS}/?searchEmailTerm=test`)
-      // .set('authorization', authHeader)
+      .set('authorization', basicAuthHeader)
       .expect(HttpStatus.OK);
 
     expect(response1.body.items.length).toEqual(2);
@@ -115,7 +115,7 @@ describe('Users Positive (e2e)', () => {
 
     const response1 = await request(app.getHttpServer())
       .get(`${API_PREFIX}${API_PATH.USERS}/?searchLoginTerm=test0`)
-      // .set('authorization', authHeader)
+      .set('authorization', basicAuthHeader)
       .expect(HttpStatus.OK);
 
     expect(response1.body.items.length).toEqual(1);
@@ -135,7 +135,7 @@ describe('Users Positive (e2e)', () => {
 
     const response1 = await request(app.getHttpServer())
       .get(`${API_PREFIX}${API_PATH.USERS}/?pageNumber=2&pageSize=2`)
-      // .set('authorization', authHeader)
+      .set('authorization', basicAuthHeader)
       .expect(HttpStatus.OK);
     expect(response1.body).toEqual({
       page: 2,
@@ -152,7 +152,7 @@ describe('Users Positive (e2e)', () => {
     // Default sortDir = desc
     const response1 = await request(app.getHttpServer())
       .get(`${API_PREFIX}${API_PATH.USERS}/?sortBy=login`)
-      // .set('authorization', authHeader)
+      .set('authorization', basicAuthHeader)
       .expect(HttpStatus.OK);
     expect(response1.body.items[0].login).toEqual('test3');
     expect(response1.body.items[3].login).toEqual('test0');
@@ -163,7 +163,7 @@ describe('Users Positive (e2e)', () => {
 
     const response1 = await request(app.getHttpServer())
       .get(`${API_PREFIX}${API_PATH.USERS}/?sortBy=login&sortDirection=asc`)
-      // .set('authorization', authHeader)
+      .set('authorization', basicAuthHeader)
       .expect(HttpStatus.OK);
     expect(response1.body.items[0].login).toEqual('test0');
     expect(response1.body.items[3].login).toEqual('test3');
@@ -176,7 +176,7 @@ describe('Users Positive (e2e)', () => {
       .get(
         `${API_PREFIX}${API_PATH.USERS}/?sortBy=login&sortDirection=asc&searchEmailTerm=test&searchLoginTerm=test`,
       )
-      // .set('authorization', authHeader)
+      .set('authorization', basicAuthHeader)
       .expect(HttpStatus.OK);
     expect(response1.body.items.length).toEqual(4);
     expect(response1.body.items[0].login).toEqual('test0');

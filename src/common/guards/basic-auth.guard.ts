@@ -7,7 +7,7 @@ import {
 import { Observable } from 'rxjs';
 import { Request } from 'express';
 
-const fromUTF8ToBase64 = (code: string) => {
+export const fromUTF8ToBase64 = (code: string) => {
   const buff2 = Buffer.from(code, 'utf8');
   return buff2.toString('base64');
 };

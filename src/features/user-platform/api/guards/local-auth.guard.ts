@@ -8,7 +8,7 @@ import { LoginUserDto } from '../input-dto/login-user.dto';
 export class LocalAuthGuard extends AuthGuard('local') {
   async canActivate(context: ExecutionContext) {
     const request = context.switchToHttp().getRequest<Request>();
-    const response = context.switchToHttp().getResponse<Response>();
+    // const response = context.switchToHttp().getResponse<Response>();
 
     // transform the request object to class instance
     const body = plainToClass(LoginUserDto, request.body);

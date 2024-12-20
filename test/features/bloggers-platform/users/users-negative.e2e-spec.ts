@@ -7,7 +7,10 @@ import * as request from 'supertest';
 import { API_PREFIX } from '../../../../src/settings/global-prefix.setup';
 import { API_PATH } from '../../../../src/common/config';
 import { TestingModule as TestModule } from '../../../../src/features/testing/testing.module';
-import { UsersTestManager } from '../../../helpers/users-test-manager';
+import {
+  basicAuthHeader,
+  UsersTestManager,
+} from '../../../helpers/users-test-manager';
 import { createUserInput } from '../../../helpers/inputs';
 import { ObjectId } from 'mongodb';
 
@@ -54,7 +57,7 @@ describe('Users Negative (e2e)', () => {
     const response = await request(app.getHttpServer())
       .post(API_PREFIX + API_PATH.USERS)
       .send(createUserInput)
-      // .set('authorization', authHeader)
+      .set('authorization', basicAuthHeader)
       .expect(HttpStatus.BAD_REQUEST);
 
     expect(response.body).toEqual({
@@ -73,7 +76,7 @@ describe('Users Negative (e2e)', () => {
     const response = await request(app.getHttpServer())
       .post(API_PREFIX + API_PATH.USERS)
       .send(createUserInput)
-      // .set('authorization', authHeader)
+      .set('authorization', basicAuthHeader)
       .expect(HttpStatus.BAD_REQUEST);
 
     expect(response.body).toEqual({
@@ -91,7 +94,7 @@ describe('Users Negative (e2e)', () => {
 
     await request(app.getHttpServer())
       .del(`${API_PREFIX}${API_PATH.USERS}/${userId}`)
-      // .set('authorization', authHeader)
+      .set('authorization', basicAuthHeader)
       .expect(HttpStatus.NOT_FOUND);
   });
 
@@ -99,7 +102,7 @@ describe('Users Negative (e2e)', () => {
     const response = await request(app.getHttpServer())
       .post(API_PREFIX + API_PATH.USERS)
       .send({ ...createUserInput, login: 123 })
-      // .set('authorization', authHeader)
+      .set('authorization', basicAuthHeader)
       .expect(HttpStatus.BAD_REQUEST);
 
     expect(response.body).toEqual({
@@ -116,7 +119,7 @@ describe('Users Negative (e2e)', () => {
     const response = await request(app.getHttpServer())
       .post(API_PREFIX + API_PATH.USERS)
       .send({ ...createUserInput, login: 'c2' })
-      // .set('authorization', authHeader)
+      .set('authorization', basicAuthHeader)
       .expect(HttpStatus.BAD_REQUEST);
 
     expect(response.body).toEqual({
@@ -133,7 +136,7 @@ describe('Users Negative (e2e)', () => {
     const response = await request(app.getHttpServer())
       .post(API_PREFIX + API_PATH.USERS)
       .send({ ...createUserInput, login: 'hellodima11' })
-      // .set('authorization', authHeader)
+      .set('authorization', basicAuthHeader)
       .expect(HttpStatus.BAD_REQUEST);
 
     expect(response.body).toEqual({
@@ -150,7 +153,7 @@ describe('Users Negative (e2e)', () => {
     const response = await request(app.getHttpServer())
       .post(API_PREFIX + API_PATH.USERS)
       .send({ ...createUserInput, password: 123456 })
-      // .set('authorization', authHeader)
+      .set('authorization', basicAuthHeader)
       .expect(HttpStatus.BAD_REQUEST);
 
     expect(response.body).toEqual({
@@ -167,7 +170,7 @@ describe('Users Negative (e2e)', () => {
     const response = await request(app.getHttpServer())
       .post(API_PREFIX + API_PATH.USERS)
       .send({ ...createUserInput, password: 'pass5' })
-      // .set('authorization', authHeader)
+      .set('authorization', basicAuthHeader)
       .expect(HttpStatus.BAD_REQUEST);
 
     expect(response.body).toEqual({
@@ -184,7 +187,7 @@ describe('Users Negative (e2e)', () => {
     const response = await request(app.getHttpServer())
       .post(API_PREFIX + API_PATH.USERS)
       .send({ ...createUserInput, password: 'a'.repeat(21) })
-      // .set('authorization', authHeader)
+      .set('authorization', basicAuthHeader)
       .expect(HttpStatus.BAD_REQUEST);
 
     expect(response.body).toEqual({
@@ -201,7 +204,7 @@ describe('Users Negative (e2e)', () => {
     const response = await request(app.getHttpServer())
       .post(API_PREFIX + API_PATH.USERS)
       .send({ ...createUserInput, email: 'incorrect' })
-      // .set('authorization', authHeader)
+      .set('authorization', basicAuthHeader)
       .expect(HttpStatus.BAD_REQUEST);
 
     expect(response.body).toEqual({
@@ -218,7 +221,7 @@ describe('Users Negative (e2e)', () => {
     const response = await request(app.getHttpServer())
       .post(API_PREFIX + API_PATH.USERS)
       .send({ ...createUserInput, email: 123456 })
-      // .set('authorization', authHeader)
+      .set('authorization', basicAuthHeader)
       .expect(HttpStatus.BAD_REQUEST);
 
     expect(response.body).toEqual({

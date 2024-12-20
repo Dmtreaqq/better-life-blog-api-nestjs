@@ -156,7 +156,7 @@ describe('Blogs Negative (e2e)', () => {
       errorsMessages: [
         {
           field: 'name',
-          message: 'name must be shorter than or equal to 15 characters',
+          message: 'name must be a string',
         },
       ],
     });

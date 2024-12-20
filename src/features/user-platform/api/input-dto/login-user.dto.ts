@@ -1,11 +1,14 @@
 import { IsNotEmpty, IsString } from 'class-validator';
+import { Trim } from '../../../../common/decorators/custom-trim.decorator';
 
 export class LoginUserDto {
-  @IsString()
   @IsNotEmpty()
+  @Trim()
+  @IsString()
   loginOrEmail: string;
 
-  @IsString()
   @IsNotEmpty()
+  @Trim()
+  @IsString()
   password: string;
 }

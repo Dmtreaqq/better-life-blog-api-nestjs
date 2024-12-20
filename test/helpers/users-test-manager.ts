@@ -8,6 +8,9 @@ import {
 import { API_PREFIX } from '../../src/settings/global-prefix.setup';
 import { delay } from 'rxjs';
 import { API_PATH } from '../../src/common/config';
+import { fromUTF8ToBase64 } from '../../src/common/guards/basic-auth.guard';
+
+export const basicAuthHeader = `Basic ${fromUTF8ToBase64('admin:qwerty')}`;
 
 export class UsersTestManager {
   constructor(private app: INestApplication) {}
