@@ -19,6 +19,8 @@ import { RegistrationUserDto } from './input-dto/registration-user.dto';
 import { ConfirmationCodeDto } from './input-dto/confirmation-code.dto';
 import { EmailDto } from './input-dto/email.dto';
 import { ConfirmNewPasswordDto } from './input-dto/confirm-new-password.dto';
+import { GetUser } from '../../../common/decorators/get-user.decorator';
+import { UserContext } from '../../../common/dto/user-context.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -30,8 +32,8 @@ export class AuthController {
   @UseGuards(LocalAuthGuard)
   @HttpCode(HttpStatus.OK)
   @Post('login')
-  async login(@Req() req) {
-    return this.authService.login(req.user.id);
+  async login(@GetUser() userContext: UserContext) {
+    return this.authService.login(userContext.id);
   }
 
   @HttpCode(HttpStatus.NO_CONTENT)
@@ -66,8 +68,8 @@ export class AuthController {
 
   @UseGuards(JwtAuthGuard)
   @Get('me')
-  async getMe(@Req() req): Promise<MeViewDto> {
-    const user = await this.usersQueryRepository.getByIdOrThrow(req.user.id);
+  async getMe(@GetUser() userContext: UserContext): Promise<MeViewDto> {
+    const user = await this.usersQueryRepository.getByIdOrThrow(userContext.id);
 
     // TODO: Maybe use queryRepo here
     return MeViewDto.mapToView(user as UserDocument);
