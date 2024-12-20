@@ -14,7 +14,8 @@ import { User, UserModelType } from '../domain/user.entity';
 import { add } from 'date-fns/add';
 import { ConfirmationCodeDto } from '../api/input-dto/confirmation-code.dto';
 import { EmailService } from '../../communication/email.service';
-import { ResendConfirmEmailDto } from '../api/input-dto/resend-confirm-email.dto';
+import { EmailDto } from '../api/input-dto/email.dto';
+import { ConfirmNewPasswordDto } from '../api/input-dto/confirm-new-password.dto';
 
 @Injectable()
 export class AuthService {
@@ -117,7 +118,7 @@ export class AuthService {
     await this.usersRepository.save(user);
   }
 
-  async resendConfirmRegistration(dto: ResendConfirmEmailDto) {
+  async resendConfirmRegistration(dto: EmailDto) {
     const user = await this.usersRepository.findByEmail(dto.email);
     if (!user) {
       throw new BadRequestException([
@@ -137,9 +138,61 @@ export class AuthService {
       ]);
     }
 
+    user.confirmationCodeExpirationDate = add(new Date(), {
+      minutes: 3,
+    }).toISOString();
+
+    await this.usersRepository.save(user);
+
     this.emailService
       .sendConfirmationEmail(user.confirmationCode, dto.email)
       .catch((e) => console.log(e));
+  }
+
+  async recoverPassword(dto: EmailDto) {
+    const user = await this.usersRepository.findByEmail(dto.email);
+    if (!user) {
+      return;
+    }
+
+    user.recoveryCodeExpirationDate = add(new Date(), {
+      minutes: 3,
+    }).toISOString();
+
+    await this.usersRepository.save(user);
+
+    this.emailService
+      .sendConfirmationEmail(user.recoveryCode, dto.email)
+      .catch((e) => console.log(e));
+  }
+
+  async confirmNewPassword(dto: ConfirmNewPasswordDto) {
+    const user = await this.usersRepository.findByRecoveryCode(
+      dto.recoveryCode,
+    );
+    if (!user || user.recoveryCode !== dto.recoveryCode) {
+      throw new BadRequestException([
+        {
+          message: 'Incorrect code',
+          field: 'recoveryCode',
+        },
+      ]);
+    }
+
+    if (new Date().toISOString() > user.recoveryCodeExpirationDate) {
+      throw new BadRequestException([
+        {
+          message: 'Expired code',
+          field: 'recoveryCode',
+        },
+      ]);
+    }
+
+    user.password = await this.cryptoService.createPasswordHash(
+      dto.newPassword,
+    );
+
+    await this.usersRepository.save(user);
   }
 
   async validateUser(loginOrEmail: string, password: string): Promise<any> {

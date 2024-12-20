@@ -17,7 +17,8 @@ import { MeViewDto } from './view-dto/users.view-dto';
 import { UserDocument } from '../domain/user.entity';
 import { RegistrationUserDto } from './input-dto/registration-user.dto';
 import { ConfirmationCodeDto } from './input-dto/confirmation-code.dto';
-import { ResendConfirmEmailDto } from './input-dto/resend-confirm-email.dto';
+import { EmailDto } from './input-dto/email.dto';
+import { ConfirmNewPasswordDto } from './input-dto/confirm-new-password.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -47,8 +48,20 @@ export class AuthController {
 
   @HttpCode(HttpStatus.NO_CONTENT)
   @Post('registration-email-resending')
-  async resendConfirmRegistration(@Body() dto: ResendConfirmEmailDto) {
+  async resendConfirmRegistration(@Body() dto: EmailDto) {
     await this.authService.resendConfirmRegistration(dto);
+  }
+
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @Post('password-recovery')
+  async recoverPassword(@Body() dto: EmailDto) {
+    await this.authService.recoverPassword(dto);
+  }
+
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @Post('new-password')
+  async confirmNewPassword(@Body() dto: ConfirmNewPasswordDto) {
+    await this.authService.confirmNewPassword(dto);
   }
 
   @UseGuards(JwtAuthGuard)
