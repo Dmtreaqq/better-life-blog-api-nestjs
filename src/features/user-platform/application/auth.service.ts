@@ -150,6 +150,7 @@ export class AuthService {
     user.confirmationCodeExpirationDate = add(new Date(), {
       minutes: 3,
     }).toISOString();
+    user.confirmationCode = randomUUID();
 
     await this.usersRepository.save(user);
 
@@ -167,6 +168,8 @@ export class AuthService {
     user.recoveryCodeExpirationDate = add(new Date(), {
       minutes: 3,
     }).toISOString();
+
+    user.recoveryCode = randomUUID();
 
     await this.usersRepository.save(user);
 
