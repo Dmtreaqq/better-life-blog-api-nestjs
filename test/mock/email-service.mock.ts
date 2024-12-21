@@ -5,7 +5,7 @@ export class EmailServiceMock extends EmailService {
     confirmCode: string,
     toEmail: string,
   ): Promise<void> {
-    console.log('Confirm mock email sent');
+    console.log('Confirm mock email sent to email:', toEmail);
 
     return Promise.resolve();
   }

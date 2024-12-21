@@ -150,11 +150,10 @@ describe('Auth Positive (e2e)', () => {
 
   it('should return 204 when POST successful email resend while confirm email', async () => {
     await usersTestManager.registerUser(createUserInput);
-    const userFromDb = await usersRepository.findByEmail(createUserInput.email);
 
     await request(app.getHttpServer())
       .post(API_PREFIX + API_PATH.AUTH + '/registration-email-resending')
-      .send({ email: userFromDb.email })
+      .send({ email: createUserInput.email })
       .expect(HttpStatus.NO_CONTENT);
   });
 

@@ -63,7 +63,7 @@ describe('Users Negative (e2e)', () => {
     expect(response.body).toEqual({
       errorsMessages: [
         {
-          field: 'email or login',
+          field: 'email',
           message: 'User already exists',
         },
       ],
@@ -82,7 +82,7 @@ describe('Users Negative (e2e)', () => {
     expect(response.body).toEqual({
       errorsMessages: [
         {
-          field: 'email or login',
+          field: 'email',
           message: 'User already exists',
         },
       ],

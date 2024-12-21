@@ -44,7 +44,7 @@ export class AuthService {
       throw new BadRequestException([
         {
           message: 'User already exists',
-          field: 'email or login',
+          field: 'email',
         },
       ]);
     }
