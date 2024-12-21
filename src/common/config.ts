@@ -3,4 +3,5 @@ export enum API_PATH {
   BLOGS = '/blogs',
   POSTS = '/posts',
   USERS = '/users',
+  AUTH = '/auth',
 }

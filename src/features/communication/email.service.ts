@@ -32,7 +32,7 @@ export class EmailService {
         </p>
       `;
 
-    const info = await this.mailerService.sendMail({
+    await this.mailerService.sendMail({
       from: '"Dmytro Pavlov 👻" <dmytro@modern-med.space>',
       to: toEmail,
       subject: 'Blog - Recover Password ✔',

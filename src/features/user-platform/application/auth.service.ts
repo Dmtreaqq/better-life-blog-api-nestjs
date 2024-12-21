@@ -31,7 +31,7 @@ export class AuthService {
   async login(userId: string) {
     const payload = { id: userId } as UserContext;
     return {
-      access_token: this.jwtService.sign(payload),
+      accessToken: this.jwtService.sign(payload),
     };
   }
 
@@ -61,10 +61,10 @@ export class AuthService {
       recoveryCode: randomUUID(),
       isConfirmed: false,
       confirmationCodeExpirationDate: add(new Date(), {
-        minutes: 2,
+        minutes: 3,
       }).toISOString(),
       recoveryCodeExpirationDate: add(new Date(), {
-        minutes: 2,
+        minutes: 3,
       }).toISOString(),
     });
 
@@ -162,7 +162,7 @@ export class AuthService {
     await this.usersRepository.save(user);
 
     this.emailService
-      .sendConfirmationEmail(user.recoveryCode, dto.email)
+      .sendRecoverPasswordEmail(user.recoveryCode, dto.email)
       .catch((e) => console.log(e));
   }
 

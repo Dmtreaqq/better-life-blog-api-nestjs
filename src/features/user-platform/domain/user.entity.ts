@@ -49,6 +49,7 @@ export class User {
     user.isConfirmed = dto.isConfirmed;
     user.recoveryCode = dto.recoveryCode;
     user.recoveryCodeExpirationDate = dto.recoveryCodeExpirationDate;
+    user.confirmationCodeExpirationDate = dto.confirmationCodeExpirationDate;
 
     return user as UserDocument;
   }

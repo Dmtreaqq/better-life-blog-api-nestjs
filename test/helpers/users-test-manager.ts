@@ -10,10 +10,23 @@ import { delay } from 'rxjs';
 import { API_PATH } from '../../src/common/config';
 import { fromUTF8ToBase64 } from '../../src/common/guards/basic-auth.guard';
 
+import { RegistrationUserDto } from '../../src/features/user-platform/api/input-dto/registration-user.dto';
+
 export const basicAuthHeader = `Basic ${fromUTF8ToBase64('admin:qwerty')}`;
 
 export class UsersTestManager {
   constructor(private app: INestApplication) {}
+
+  // async getUserFromDBbyEmail(email: string): Promise<UserDocument> {
+  //   return this.usersRepo.findByEmail(email);
+  // }
+
+  async registerUser(createModel: RegistrationUserDto): Promise<void> {
+    await request(this.app.getHttpServer())
+      .post(API_PREFIX + API_PATH.AUTH + '/registration')
+      .send(createModel)
+      .expect(HttpStatus.NO_CONTENT);
+  }
 
   async createUser(
     createModel: CreateUserInputDto,

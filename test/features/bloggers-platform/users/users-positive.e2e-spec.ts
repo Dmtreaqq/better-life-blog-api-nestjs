@@ -7,7 +7,10 @@ import * as request from 'supertest';
 import { API_PREFIX } from '../../../../src/settings/global-prefix.setup';
 import { API_PATH } from '../../../../src/common/config';
 import { TestingModule as TestModule } from '../../../../src/features/testing/testing.module';
-import { basicAuthHeader, UsersTestManager } from '../../../helpers/users-test-manager';
+import {
+  basicAuthHeader,
+  UsersTestManager,
+} from '../../../helpers/users-test-manager';
 import { createUserInput } from '../../../helpers/inputs';
 
 describe('Users Positive (e2e)', () => {
