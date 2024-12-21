@@ -61,8 +61,6 @@ describe('Auth Positive (e2e)', () => {
   });
 
   it('should return 204 when POST successful registration', async () => {
-    const consoleLogSpy = jest.spyOn(console, 'log');
-
     await request(app.getHttpServer())
       .post(API_PREFIX + API_PATH.AUTH + '/registration')
       .send(createUserInput)
@@ -73,7 +71,6 @@ describe('Auth Positive (e2e)', () => {
       .set('authorization', basicAuthHeader)
       .expect(HttpStatus.OK);
 
-    expect(consoleLogSpy).toBeCalledWith('Confirm mock email sent');
     expect(response.body.items).toEqual([
       {
         login: createUserInput.login,

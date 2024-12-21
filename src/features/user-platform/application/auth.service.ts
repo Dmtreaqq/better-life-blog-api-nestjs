@@ -40,11 +40,20 @@ export class AuthService {
       dto.login,
       dto.email,
     );
-    if (isUserExist) {
+    if (isUserExist && isUserExist.email === dto.email) {
       throw new BadRequestException([
         {
-          message: 'User already exists',
+          message: 'Incorrect',
           field: 'email',
+        },
+      ]);
+    }
+
+    if (isUserExist && isUserExist.login === dto.login) {
+      throw new BadRequestException([
+        {
+          message: 'Incorrect',
+          field: 'login',
         },
       ]);
     }
