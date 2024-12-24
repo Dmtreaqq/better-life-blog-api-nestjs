@@ -4,7 +4,7 @@ import * as request from 'supertest';
 import { API_PREFIX } from '../../src/settings/global-prefix.setup';
 // import { delay } from './delay';
 import { CreatePostInputDto } from '../../src/features/bloggers-platform/api/input-dto/create-post-input.dto';
-import { API_PATH } from '../../src/common/config';
+import { API_PATH } from '../../src/common/constants';
 import { PostViewDto } from '../../src/features/bloggers-platform/api/view-dto/post.view-dto';
 import { delay } from './delay';
 

@@ -11,7 +11,6 @@ import { PassportModule } from '@nestjs/passport';
 import { LocalStrategy } from './api/guards/local.strategy';
 import { AuthController } from './api/auth.controller';
 import { JwtModule } from '@nestjs/jwt';
-import * as process from 'node:process';
 import { CommunicationModule } from '../communication/communication.module';
 
 // TODO: спросить почему мьі добавили паспорт модуль

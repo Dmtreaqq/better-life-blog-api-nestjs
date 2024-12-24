@@ -8,7 +8,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { appSetup } from '../../../../src/settings/app.setup';
 import * as request from 'supertest';
 import { API_PREFIX } from '../../../../src/settings/global-prefix.setup';
-import { API_PATH } from '../../../../src/common/config';
+import { API_PATH } from '../../../../src/common/constants';
 import { createBlogInput, createPostInput } from '../../../helpers/inputs';
 import { TestingModule as TestModule } from '../../../../src/features/testing/testing.module';
 import { ObjectId } from 'mongodb';

@@ -4,13 +4,14 @@ import * as request from 'supertest';
 import { BloggersPlatformModule } from '../../../../src/features/bloggers-platform/bloggers-platform.module';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import { MongooseModule } from '@nestjs/mongoose';
-import { API_PATH } from '../../../../src/common/config';
+import { API_PATH } from '../../../../src/common/constants';
 import { API_PREFIX } from '../../../../src/settings/global-prefix.setup';
 import { appSetup } from '../../../../src/settings/app.setup';
 import { BlogsTestManager } from '../../../helpers/blogs-test-manager';
 import { UpdateBlogInput } from '../../../../src/features/bloggers-platform/api/input-dto/update-blog.dto';
 import { CreatePostInputDto } from '../../../../src/features/bloggers-platform/api/input-dto/create-post-input.dto';
 import { TestingModule as TestModule } from '../../../../src/features/testing/testing.module';
+import { AppModule } from '../../../../src/app.module';
 
 describe('Blogs Positive (e2e)', () => {
   let app: INestApplication;
@@ -21,7 +22,6 @@ describe('Blogs Positive (e2e)', () => {
     mongoServer = await MongoMemoryServer.create();
     const mongoUri = mongoServer.getUri();
 
-    // TODO: добавить Test Module
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [TestModule, MongooseModule.forRoot(mongoUri)],
     }).compile();

@@ -8,7 +8,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { appSetup } from '../../../../src/settings/app.setup';
 import * as request from 'supertest';
 import { API_PREFIX } from '../../../../src/settings/global-prefix.setup';
-import { API_PATH } from '../../../../src/common/config';
+import { API_PATH } from '../../../../src/common/constants';
 import { createPostInput } from '../../../helpers/inputs';
 import { UpdatePostInputDto } from '../../../../src/features/bloggers-platform/api/input-dto/update-post-input.dto';
 import { ReactionStatus } from '../../../../src/features/bloggers-platform/api/enums/ReactionStatus';

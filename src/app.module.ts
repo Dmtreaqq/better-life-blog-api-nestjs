@@ -1,3 +1,4 @@
+import { configModule } from './config-module';
 import { Module } from '@nestjs/common';
 import { BloggersPlatformModule } from './features/bloggers-platform/bloggers-platform.module';
 import { MongooseModule } from '@nestjs/mongoose';
@@ -5,6 +6,8 @@ import { Connection } from 'mongoose';
 import { TestingModule } from './features/testing/testing.module';
 import { UserPlatformModule } from './features/user-platform/user-platform.module';
 import { CommonModule } from './common/common.module';
+
+// TODO: вьінести время жизни токена в .env
 
 @Module({
   imports: [
@@ -25,6 +28,7 @@ import { CommonModule } from './common/common.module';
     UserPlatformModule,
     BloggersPlatformModule,
     CommonModule,
+    configModule,
   ],
   controllers: [],
   providers: [],

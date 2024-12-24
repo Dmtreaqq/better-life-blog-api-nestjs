@@ -7,7 +7,7 @@ import {
 } from '../../src/features/user-platform/api/view-dto/users.view-dto';
 import { API_PREFIX } from '../../src/settings/global-prefix.setup';
 import { delay } from 'rxjs';
-import { API_PATH } from '../../src/common/config';
+import { API_PATH } from '../../src/common/constants';
 import { fromUTF8ToBase64 } from '../../src/common/guards/basic-auth.guard';
 
 import { RegistrationUserDto } from '../../src/features/user-platform/api/input-dto/registration-user.dto';
