@@ -12,6 +12,7 @@ import {
   UsersTestManager,
 } from '../../../helpers/users-test-manager';
 import { createUserInput } from '../../../helpers/inputs';
+import { CommonConfig } from '../../../../src/common/common.config';
 
 describe('Users Positive (e2e)', () => {
   let app: INestApplication;
@@ -27,7 +28,8 @@ describe('Users Positive (e2e)', () => {
     }).compile();
 
     app = moduleFixture.createNestApplication();
-    appSetup(app);
+    const commonConfig = app.get(CommonConfig);
+    appSetup(app, commonConfig);
     usersTestManager = new UsersTestManager(app);
 
     await app.init();

@@ -12,6 +12,7 @@ import { UpdateBlogInput } from '../../../../src/features/bloggers-platform/api/
 import { CreatePostInputDto } from '../../../../src/features/bloggers-platform/api/input-dto/create-post-input.dto';
 import { TestingModule as TestModule } from '../../../../src/features/testing/testing.module';
 import { AppModule } from '../../../../src/app.module';
+import { CommonConfig } from '../../../../src/common/common.config';
 
 describe('Blogs Positive (e2e)', () => {
   let app: INestApplication;
@@ -27,7 +28,8 @@ describe('Blogs Positive (e2e)', () => {
     }).compile();
 
     app = moduleFixture.createNestApplication();
-    appSetup(app);
+    const commonConfig = app.get(CommonConfig);
+    appSetup(app, commonConfig);
     blogsTestManager = new BlogsTestManager(app);
 
     await app.init();

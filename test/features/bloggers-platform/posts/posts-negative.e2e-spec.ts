@@ -12,6 +12,7 @@ import { API_PATH } from '../../../../src/common/constants';
 import { createBlogInput, createPostInput } from '../../../helpers/inputs';
 import { TestingModule as TestModule } from '../../../../src/features/testing/testing.module';
 import { ObjectId } from 'mongodb';
+import { CommonConfig } from '../../../../src/common/common.config';
 
 describe('Posts Negative (e2e)', () => {
   let app: INestApplication;
@@ -34,7 +35,8 @@ describe('Posts Negative (e2e)', () => {
     }).compile();
 
     app = moduleFixture.createNestApplication();
-    appSetup(app);
+    const commonConfig = app.get(CommonConfig);
+    appSetup(app, commonConfig);
     blogsTestManager = new BlogsTestManager(app);
     postsTestManager = new PostsTestManager(app);
 

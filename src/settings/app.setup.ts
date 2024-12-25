@@ -3,10 +3,11 @@ import { INestApplication } from '@nestjs/common';
 import { globalPrefixSetup } from './global-prefix.setup';
 import { swaggerSetup } from './swagger.setup';
 import { exceptionsFilterSetup } from './exceptions-filter.setup';
+import { CommonConfig } from '../common/common.config';
 
-export function appSetup(app: INestApplication) {
-  exceptionsFilterSetup(app);
+export function appSetup(app: INestApplication, commonConfig: CommonConfig) {
+  exceptionsFilterSetup(app, commonConfig);
   pipesSetup(app);
   globalPrefixSetup(app);
-  swaggerSetup(app);
+  swaggerSetup(app, commonConfig);
 }

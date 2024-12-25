@@ -1,6 +1,6 @@
 import { ConfigModule } from '@nestjs/config';
 
-export const configModule = ConfigModule.forRoot({
+export const configDynamicModule = ConfigModule.forRoot({
   envFilePath: [
     `.env.${process.env.NODE_ENV}.local`,
     `.env.${process.env.NODE_ENV}`,

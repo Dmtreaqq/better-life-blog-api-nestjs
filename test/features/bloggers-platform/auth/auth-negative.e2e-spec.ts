@@ -15,6 +15,7 @@ import { EmailService } from '../../../../src/features/communication/email.servi
 import { EmailServiceMock } from '../../../mock/email-service.mock';
 import { UsersRepository } from '../../../../src/features/user-platform/repositories/users.repository';
 import { sub } from 'date-fns/sub';
+import { CommonConfig } from '../../../../src/common/common.config';
 
 describe('Auth Negative (e2e)', () => {
   let app: INestApplication;
@@ -34,7 +35,8 @@ describe('Auth Negative (e2e)', () => {
       .compile();
 
     app = moduleFixture.createNestApplication();
-    appSetup(app);
+    const commonConfig = app.get(CommonConfig);
+    appSetup(app, commonConfig);
 
     usersTestManager = new UsersTestManager(app);
     usersRepository = moduleFixture.get<UsersRepository>(UsersRepository);

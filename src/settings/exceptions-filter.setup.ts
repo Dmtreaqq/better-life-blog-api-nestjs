@@ -6,10 +6,12 @@ import {
   HttpStatus,
   INestApplication,
 } from '@nestjs/common';
-import * as process from 'node:process';
+import { CommonConfig } from '../common/common.config';
 
 @Catch()
 class AllExceptionsFilter implements ExceptionFilter {
+  constructor(private commonConfig: CommonConfig) {}
+
   catch(exception: any, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse();
@@ -19,7 +21,7 @@ class AllExceptionsFilter implements ExceptionFilter {
         ? exception.getStatus()
         : HttpStatus.INTERNAL_SERVER_ERROR;
 
-    if (process.env.NODE_ENV !== 'production') {
+    if (this.commonConfig.env !== 'production') {
       response.status(status).json({
         statusCode: status,
         timestamp: new Date().toISOString(),
@@ -36,13 +38,15 @@ class AllExceptionsFilter implements ExceptionFilter {
 
 @Catch(HttpException)
 class CustomHttpExceptionsFilter implements ExceptionFilter {
+  constructor(private commonConfig: CommonConfig) {}
+
   catch(exception: HttpException, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse();
 
     const status = exception.getStatus();
 
-    if (status === 500 && process.env.NODE_ENV !== 'production') {
+    if (status === 500 && this.commonConfig.env !== 'production') {
       response.status(status).json(exception);
     }
 
@@ -64,9 +68,12 @@ class CustomHttpExceptionsFilter implements ExceptionFilter {
   }
 }
 
-export function exceptionsFilterSetup(app: INestApplication) {
+export function exceptionsFilterSetup(
+  app: INestApplication,
+  commonConfig: CommonConfig,
+) {
   app.useGlobalFilters(
-    new AllExceptionsFilter(),
-    new CustomHttpExceptionsFilter(),
+    new AllExceptionsFilter(commonConfig),
+    new CustomHttpExceptionsFilter(commonConfig),
   );
 }

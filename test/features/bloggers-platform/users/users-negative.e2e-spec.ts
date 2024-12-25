@@ -13,6 +13,7 @@ import {
 } from '../../../helpers/users-test-manager';
 import { createUserInput } from '../../../helpers/inputs';
 import { ObjectId } from 'mongodb';
+import { CommonConfig } from '../../../../src/common/common.config';
 
 describe('Users Negative (e2e)', () => {
   let app: INestApplication;
@@ -28,7 +29,8 @@ describe('Users Negative (e2e)', () => {
     }).compile();
 
     app = moduleFixture.createNestApplication();
-    appSetup(app);
+    const commonConfig = app.get(CommonConfig);
+    appSetup(app, commonConfig);
     usersTestManager = new UsersTestManager(app);
 
     await app.init();

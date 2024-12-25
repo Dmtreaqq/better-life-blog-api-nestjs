@@ -12,15 +12,21 @@ import { LocalStrategy } from './api/guards/local.strategy';
 import { AuthController } from './api/auth.controller';
 import { JwtModule } from '@nestjs/jwt';
 import { CommunicationModule } from '../communication/communication.module';
+import { CommonConfig } from '../../common/common.config';
 
 // TODO: спросить почему мьі добавили паспорт модуль
 @Module({
   imports: [
     PassportModule,
     CommunicationModule,
-    JwtModule.register({
-      secret: process.env.JWT_SECRET || 'secret',
-      signOptions: { expiresIn: '7m' },
+    JwtModule.registerAsync({
+      useFactory: (commonConfig: CommonConfig) => {
+        return {
+          secret: commonConfig.accessTokenSecret,
+          signOptions: { expiresIn: '7m' },
+        };
+      },
+      inject: [CommonConfig],
     }),
     MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
   ],

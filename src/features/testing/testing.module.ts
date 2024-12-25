@@ -4,7 +4,7 @@ import { BloggersPlatformModule } from '../bloggers-platform/bloggers-platform.m
 import { UserPlatformModule } from '../user-platform/user-platform.module';
 import { CommunicationModule } from '../communication/communication.module';
 import { CommonModule } from '../../common/common.module';
-import { configModule } from '../../config-module';
+import { configDynamicModule } from '../../config-dynamic-module';
 
 @Module({
   imports: [
@@ -12,7 +12,7 @@ import { configModule } from '../../config-module';
     BloggersPlatformModule,
     UserPlatformModule,
     CommunicationModule,
-    configModule,
+    configDynamicModule,
   ],
   controllers: [TestingController],
 })

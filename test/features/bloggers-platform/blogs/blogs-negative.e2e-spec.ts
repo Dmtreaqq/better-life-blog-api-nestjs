@@ -10,6 +10,7 @@ import { BlogsTestManager } from '../../../helpers/blogs-test-manager';
 import { ObjectId } from 'mongodb';
 import { createBlogInput } from '../../../helpers/inputs';
 import { TestingModule as TestModule } from '../../../../src/features/testing/testing.module';
+import { CommonConfig } from '../../../../src/common/common.config';
 
 describe('Blogs Negative (e2e)', () => {
   let app: INestApplication;
@@ -26,7 +27,8 @@ describe('Blogs Negative (e2e)', () => {
     }).compile();
 
     app = moduleFixture.createNestApplication();
-    appSetup(app);
+    const commonConfig = app.get(CommonConfig);
+    appSetup(app, commonConfig);
     blogsTestManager = new BlogsTestManager(app);
     randomId = new ObjectId();
 

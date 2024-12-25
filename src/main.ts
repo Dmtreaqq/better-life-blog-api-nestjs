@@ -6,10 +6,10 @@ import { CommonConfig } from './common/common.config';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  const commongConfig = app.get<CommonConfig>(CommonConfig);
-  const port = commongConfig.port;
+  const commonConfig = app.get<CommonConfig>(CommonConfig);
+  const port = commonConfig.port;
 
-  appSetup(app);
+  appSetup(app, commonConfig);
 
   await app.listen(port ?? 3020);
 
