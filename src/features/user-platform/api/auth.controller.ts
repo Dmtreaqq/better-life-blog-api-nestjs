@@ -5,13 +5,12 @@ import {
   HttpCode,
   HttpStatus,
   Post,
-  Req,
+  Res,
   UseGuards,
 } from '@nestjs/common';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 import { AuthService } from '../application/auth.service';
 import { JwtAuthGuard } from '../../../common/guards/jwt-auth.guard';
-import { UsersService } from '../application/users.service';
 import { UsersQueryRepository } from '../repositories/query/users.query-repository';
 import { MeViewDto } from './view-dto/users.view-dto';
 import { UserDocument } from '../domain/user.entity';
@@ -21,6 +20,8 @@ import { EmailDto } from './input-dto/email.dto';
 import { ConfirmNewPasswordDto } from './input-dto/confirm-new-password.dto';
 import { GetUser } from '../../../common/decorators/get-user.decorator';
 import { UserContext } from '../../../common/dto/user-context.dto';
+import { Response } from 'express';
+import { add } from 'date-fns/add';
 
 @Controller('auth')
 export class AuthController {
@@ -32,8 +33,20 @@ export class AuthController {
   @UseGuards(LocalAuthGuard)
   @HttpCode(HttpStatus.OK)
   @Post('login')
-  async login(@GetUser() userContext: UserContext) {
-    return this.authService.login(userContext.id);
+  async login(
+    @Res({ passthrough: true }) res: Response,
+    @GetUser() userContext: UserContext,
+  ) {
+    const loginResult = await this.authService.login(userContext.id);
+    // TODO: change to refresh token form Login Result
+    res.cookie('refreshToken', loginResult.accessToken, {
+      httpOnly: true,
+      secure: true,
+      expires: add(new Date(), { hours: 24 }),
+    });
+    return {
+      accessToken: loginResult.accessToken,
+    };
   }
 
   @HttpCode(HttpStatus.NO_CONTENT)

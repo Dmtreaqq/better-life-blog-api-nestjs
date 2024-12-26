@@ -11,6 +11,8 @@ async function bootstrap() {
 
   appSetup(app, commonConfig);
 
+  app.getHttpAdapter().getInstance().disable('x-powered-by');
+
   await app.listen(port ?? 3020);
 
   console.log('App started at ' + port + ' port');
