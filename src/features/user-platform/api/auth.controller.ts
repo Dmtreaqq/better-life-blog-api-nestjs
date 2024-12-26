@@ -84,7 +84,6 @@ export class AuthController {
   async getMe(@GetUser() userContext: UserContext): Promise<MeViewDto> {
     const user = await this.usersQueryRepository.getByIdOrThrow(userContext.id);
 
-    // TODO: Maybe use queryRepo here
     return MeViewDto.mapToView(user as UserDocument);
   }
 }

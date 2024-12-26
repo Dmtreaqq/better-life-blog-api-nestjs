@@ -1,11 +1,11 @@
 import {
-  BadRequestException,
   CanActivate,
-  ExecutionContext,
+  ExecutionContext, Inject,
   UnauthorizedException,
 } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { Request } from 'express';
+import { CommonConfig } from '../common.config';
 
 export const fromUTF8ToBase64 = (code: string) => {
   const buff2 = Buffer.from(code, 'utf8');
@@ -13,6 +13,8 @@ export const fromUTF8ToBase64 = (code: string) => {
 };
 
 export class BasicAuthGuard implements CanActivate {
+  constructor(@Inject(CommonConfig) private commonConfig: CommonConfig) {}
+
   canActivate(
     context: ExecutionContext,
   ): boolean | Promise<boolean> | Observable<boolean> {
@@ -24,7 +26,7 @@ export class BasicAuthGuard implements CanActivate {
       throw new UnauthorizedException();
     }
 
-    const codedAuth = fromUTF8ToBase64('admin:qwerty');
+    const codedAuth = fromUTF8ToBase64(this.commonConfig.basicLogin);
 
     if (authHeader.slice(6) !== codedAuth) {
       throw new UnauthorizedException();

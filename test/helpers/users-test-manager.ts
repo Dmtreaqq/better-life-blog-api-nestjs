@@ -12,7 +12,7 @@ import { fromUTF8ToBase64 } from '../../src/common/guards/basic-auth.guard';
 
 import { RegistrationUserDto } from '../../src/features/user-platform/api/input-dto/registration-user.dto';
 
-export const basicAuthHeader = `Basic ${fromUTF8ToBase64('admin:qwerty')}`;
+export const basicAuthHeader = `Basic ${fromUTF8ToBase64(process.env.BASIC_LOGIN)}`;
 
 export class UsersTestManager {
   constructor(private app: INestApplication) {}
@@ -35,7 +35,7 @@ export class UsersTestManager {
     const response = await request(this.app.getHttpServer())
       .post(`${API_PREFIX}${API_PATH.USERS}`)
       .send(createModel)
-      .auth('admin', 'qwerty')
+      .set('authorization', basicAuthHeader)
       .expect(statusCode);
 
     return response.body;

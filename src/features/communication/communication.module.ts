@@ -1,24 +1,25 @@
 import { Module } from '@nestjs/common';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { EmailService } from './email.service';
-import { CommonConfig } from '../../common/common.config';
+import { CommunicationConfig } from './communication.config';
 
 @Module({
   imports: [
     MailerModule.forRootAsync({
-      useFactory: (commonConfig: CommonConfig) => {
+      useFactory: (communicationConfig: CommunicationConfig) => {
         return {
           transport: {
             service: 'mailjet',
             auth: {
-              // TODO: add into Communication Config
-              user: process.env.MAILJET_API_KEY || '123',
-              pass: process.env.MAILJET_SECRET_KEY || '123',
+              user: communicationConfig.mailJetApiKey,
+              pass: communicationConfig.mailJetSecretKey,
             },
           },
         };
       },
-      inject: [CommonConfig],
+      inject: [CommunicationConfig],
+      // TODO: почему не работало иначе, когда помещал в Providers ??
+      extraProviders: [CommunicationConfig],
     }),
   ],
   providers: [EmailService],
