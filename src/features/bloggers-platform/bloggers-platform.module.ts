@@ -17,8 +17,13 @@ import { CreateCommentUseCase } from './application/usecases/create-comment.usec
 import { UserPlatformModule } from '../user-platform/user-platform.module';
 import { CommentsController } from './api/comments.controller';
 import { DeleteCommentUseCase } from './application/usecases/delete-comment.usecase';
+import { UpdateCommentUseCase } from './application/usecases/update-comment.usecase';
 
-const useCases = [CreateCommentUseCase, DeleteCommentUseCase];
+const useCases = [
+  CreateCommentUseCase,
+  DeleteCommentUseCase,
+  UpdateCommentUseCase,
+];
 
 @Module({
   imports: [

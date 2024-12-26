@@ -1,10 +1,11 @@
 import {
+  Body,
   Controller,
   Delete,
   Get,
   HttpCode,
   HttpStatus,
-  Param,
+  Param, Put,
   UseGuards,
 } from '@nestjs/common';
 import { CommentsQueryRepository } from '../repositories/query/comments.query-repository';
@@ -16,6 +17,8 @@ import { CommandBus } from '@nestjs/cqrs';
 import { DeleteCommentCommand } from '../application/usecases/delete-comment.usecase';
 import { GetUser } from '../../../common/decorators/get-user.decorator';
 import { UserContext } from '../../../common/dto/user-context.dto';
+import { UpdateCommentInputDto } from './input-dto/update-comment-input.dto';
+import { UpdateCommentCommand } from '../application/usecases/update-comment.usecase';
 
 @Controller('comments')
 export class CommentsController {
@@ -39,6 +42,23 @@ export class CommentsController {
   ): Promise<void> {
     await this.commandBus.execute(
       new DeleteCommentCommand(userContext.id, params.id),
+    );
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @Put(':id')
+  async editById(
+    @Param() params: IdInputDto,
+    @GetUser() userContext: UserContext,
+    @Body() dto: UpdateCommentInputDto,
+  ): Promise<void> {
+    await this.commandBus.execute(
+      new UpdateCommentCommand({
+        userId: userContext.id,
+        commentId: params.id,
+        content: dto.content,
+      }),
     );
   }
 }

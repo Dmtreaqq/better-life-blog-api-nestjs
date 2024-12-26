@@ -200,32 +200,43 @@ describe('Comments Positive (e2e)', () => {
       .get(API_PREFIX + API_PATH.COMMENTS + `/${comment.id}`)
       .expect(HttpStatus.NOT_FOUND);
   });
-  //
-  // it('should PUT a comment successfully', async () => {
-  //   const blog = await blogsTestManager.createBlog();
-  //   const post = await postsTestManager.createPost(blog.id);
-  //   const token = await authTestManager.getTokenOfLoggedInUser();
-  //   const comment = await commentsTestManager.createComment(post.id, token);
-  //
-  //   await request(app.getHttpServer())
-  //     .put(API_PREFIX + API_PATH.COMMENTS + `/${comment.id}`)
-  //     .set('authorization', `Bearer ${token}`)
-  //     .send({
-  //       content: 'This comment was changed because of test scenario',
-  //     })
-  //     .expect(HttpStatus.NO_CONTENT);
-  //
-  //   const getResponse = await request(app.getHttpServer())
-  //     .get(API_PREFIX + API_PATH.COMMENTS + `/${comment.id}`)
-  //     .expect(HttpStatus.OK);
-  //
-  //   expect(getResponse.body).toEqual({
-  //     ...comment,
-  //     id: expect.any(String),
-  //     createdAt: expect.any(String),
-  //     content: 'This comment was changed because of test scenario',
-  //   });
-  // });
+
+  it('should PUT a comment successfully', async () => {
+    const user = await usersTestManager.createUser(createUserInput);
+    const blog = await blogsTestManager.createBlog(createBlogInput);
+    const post = await postsTestManager.createPost({
+      ...createPostInput,
+      blogId: blog.id,
+    });
+    const { accessToken: token } = await usersTestManager.login(
+      user.login,
+      createUserInput.password,
+    );
+    const comment = await commentsTestManager.createComment(
+      { content: 'This is a very long comment' },
+      token,
+      post.id,
+    );
+
+    await request(app.getHttpServer())
+      .put(API_PREFIX + API_PATH.COMMENTS + `/${comment.id}`)
+      .set('authorization', `Bearer ${token}`)
+      .send({
+        content: 'This comment was changed because of test scenario',
+      })
+      .expect(HttpStatus.NO_CONTENT);
+
+    const getResponse = await request(app.getHttpServer())
+      .get(API_PREFIX + API_PATH.COMMENTS + `/${comment.id}`)
+      .expect(HttpStatus.OK);
+
+    expect(getResponse.body).toEqual({
+      ...comment,
+      id: expect.any(String),
+      createdAt: expect.any(String),
+      content: 'This comment was changed because of test scenario',
+    });
+  });
 
   // it('should PUT LIKE and DISLIKE comment successfully', async () => {
   //   const blog = await blogsTestManager.createBlog();
