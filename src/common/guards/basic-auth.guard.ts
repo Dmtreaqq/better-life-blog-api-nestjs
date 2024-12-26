@@ -1,6 +1,7 @@
 import {
   CanActivate,
-  ExecutionContext, Inject,
+  ExecutionContext,
+  Inject,
   UnauthorizedException,
 } from '@nestjs/common';
 import { Observable } from 'rxjs';
@@ -13,6 +14,7 @@ export const fromUTF8ToBase64 = (code: string) => {
 };
 
 export class BasicAuthGuard implements CanActivate {
+  // TODO: спросить про Inject
   constructor(@Inject(CommonConfig) private commonConfig: CommonConfig) {}
 
   canActivate(

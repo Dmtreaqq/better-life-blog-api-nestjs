@@ -1,7 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { HttpStatus, INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
-import { BloggersPlatformModule } from '../../../../src/features/bloggers-platform/bloggers-platform.module';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import { MongooseModule } from '@nestjs/mongoose';
 import { API_PATH } from '../../../../src/common/constants';
@@ -11,8 +10,8 @@ import { BlogsTestManager } from '../../../helpers/blogs-test-manager';
 import { UpdateBlogInput } from '../../../../src/features/bloggers-platform/api/input-dto/update-blog.dto';
 import { CreatePostInputDto } from '../../../../src/features/bloggers-platform/api/input-dto/create-post-input.dto';
 import { TestingModule as TestModule } from '../../../../src/features/testing/testing.module';
-import { AppModule } from '../../../../src/app.module';
 import { CommonConfig } from '../../../../src/common/common.config';
+import { basicAuthHeader } from '../../../helpers/users-test-manager';
 
 describe('Blogs Positive (e2e)', () => {
   let app: INestApplication;
@@ -75,7 +74,7 @@ describe('Blogs Positive (e2e)', () => {
         description: 'Desc',
         websiteUrl: 'https://google.com',
       })
-      // .set('authorization', authHeader)
+      .set('authorization', basicAuthHeader)
       .expect(HttpStatus.CREATED);
 
     expect(response.body).toEqual({
@@ -137,7 +136,7 @@ describe('Blogs Positive (e2e)', () => {
     await request(app.getHttpServer())
       .put(`${API_PREFIX}${API_PATH.BLOGS}/${blog.id}`)
       .send(newBody)
-      // .set('authorization', authHeader)
+      .set('authorization', basicAuthHeader)
       .expect(HttpStatus.NO_CONTENT);
 
     const getResponse = await request(app.getHttpServer())
@@ -201,7 +200,7 @@ describe('Blogs Positive (e2e)', () => {
         blogId: blog.id,
         content: 'post content',
       } as CreatePostInputDto)
-      // .set('authorization', authHeader)
+      .set('authorization', basicAuthHeader)
       .expect(HttpStatus.CREATED);
 
     expect(response.body).toEqual({
@@ -240,7 +239,7 @@ describe('Blogs Positive (e2e)', () => {
 
     await request(app.getHttpServer())
       .delete(`${API_PREFIX}${API_PATH.BLOGS}/${blog.id}`)
-      // .set('authorization', authHeader)
+      .set('authorization', basicAuthHeader)
       .expect(HttpStatus.NO_CONTENT);
 
     await request(app.getHttpServer())

@@ -9,6 +9,7 @@ import {
   Post,
   Put,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { CreateBlogInput } from './input-dto/create-blog.dto';
 import { BlogsService } from '../application/blogs.service';
@@ -23,6 +24,8 @@ import { PostQueryGetParams } from './input-dto/get-posts-query.dto';
 import { PostsService } from '../application/posts.service';
 import { CreatePostInputDto } from './input-dto/create-post-input.dto';
 import { IdInputDto } from '../../../common/dto/id.input-dto';
+import { BasicAuthGuard } from '../../../common/guards/basic-auth.guard';
+import { JwtOptionalAuthGuard } from '../../../common/guards/jwt-optional-auth.guard';
 
 @Controller('blogs')
 export class BlogsController {
@@ -33,6 +36,7 @@ export class BlogsController {
     private postsQueryRepository: PostsQueryRepository,
   ) {}
 
+  @UseGuards(BasicAuthGuard)
   @Post(':id/posts')
   async createPostForBlog(
     @Body() dto: Omit<CreatePostInputDto, 'blogId'>,
@@ -43,6 +47,7 @@ export class BlogsController {
     return this.postsQueryRepository.getByIdOrThrow(postId);
   }
 
+  @UseGuards(JwtOptionalAuthGuard)
   @Get(':id/posts')
   async getPostsForBlog(
     @Query() query: PostQueryGetParams,
@@ -51,6 +56,7 @@ export class BlogsController {
     return this.postsQueryRepository.getAll(query, params.id);
   }
 
+  @UseGuards(BasicAuthGuard)
   @Post()
   async createBlog(@Body() dto: CreateBlogInput) {
     const blogId = await this.blogsService.createBlog(dto);
@@ -70,12 +76,14 @@ export class BlogsController {
     return this.blogsQueryRepository.getByIdOrThrow(params.id);
   }
 
+  @UseGuards(BasicAuthGuard)
   @Put(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   async editBlog(@Param() params: IdInputDto, @Body() dto: UpdateBlogInput) {
     return this.blogsService.editBlog(params.id, dto);
   }
 
+  @UseGuards(BasicAuthGuard)
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   async deleteById(@Param() params: IdInputDto) {

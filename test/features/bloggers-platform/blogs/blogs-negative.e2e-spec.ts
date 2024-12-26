@@ -11,6 +11,7 @@ import { ObjectId } from 'mongodb';
 import { createBlogInput } from '../../../helpers/inputs';
 import { TestingModule as TestModule } from '../../../../src/features/testing/testing.module';
 import { CommonConfig } from '../../../../src/common/common.config';
+import { basicAuthHeader } from '../../../helpers/users-test-manager';
 
 describe('Blogs Negative (e2e)', () => {
   let app: INestApplication;
@@ -70,7 +71,7 @@ describe('Blogs Negative (e2e)', () => {
   it('should return 400 for DELETE by id not correct ObjectId', async () => {
     const response = await request(app.getHttpServer())
       .delete(`${API_PREFIX}${API_PATH.BLOGS}/12345`)
-      // .set('authorization', authHeader)
+      .set('authorization', basicAuthHeader)
       .expect(HttpStatus.BAD_REQUEST);
 
     expect(response.body).toEqual({
@@ -87,7 +88,7 @@ describe('Blogs Negative (e2e)', () => {
     const response = await request(app.getHttpServer())
       .put(`${API_PREFIX}${API_PATH.BLOGS}/12345`)
       .send(createBlogInput)
-      // .set('authorization', authHeader)
+      .set('authorization', basicAuthHeader)
       .expect(HttpStatus.BAD_REQUEST);
 
     expect(response.body).toEqual({
@@ -109,7 +110,7 @@ describe('Blogs Negative (e2e)', () => {
   it('should return 404 for DELETE not existing blog', async () => {
     await request(app.getHttpServer())
       .delete(`${API_PREFIX}${API_PATH.BLOGS}/${randomId}`)
-      // .set('authorization', authHeader)
+      .set('authorization', basicAuthHeader)
       .expect(HttpStatus.NOT_FOUND);
   });
 
@@ -117,7 +118,7 @@ describe('Blogs Negative (e2e)', () => {
     await request(app.getHttpServer())
       .put(`${API_PREFIX}${API_PATH.BLOGS}/${randomId}`)
       .send(createBlogInput)
-      // .set('authorization', authHeader)
+      .set('authorization', basicAuthHeader)
       .expect(HttpStatus.NOT_FOUND);
   });
 
@@ -125,7 +126,7 @@ describe('Blogs Negative (e2e)', () => {
     const response = await request(app.getHttpServer())
       .post(API_PREFIX + API_PATH.BLOGS)
       .send({ ...createBlogInput, name: '' })
-      // .set('authorization', authHeader)
+      .set('authorization', basicAuthHeader)
       .expect(HttpStatus.BAD_REQUEST);
 
     expect(response.body).toEqual({
@@ -142,7 +143,7 @@ describe('Blogs Negative (e2e)', () => {
   //   await request(app.getHttpServer())
   //     .post(`${API_PREFIX}${API_PATH.BLOGS}/${randomId}/posts`)
   //     .send({ ...postInput })
-  //     // .set('authorization', authHeader)
+      // .set('authorization', basicAuthHeader)
   //     .expect(HttpStatus.NOT_FOUND);
   // })
 
@@ -150,7 +151,7 @@ describe('Blogs Negative (e2e)', () => {
     const response = await request(app.getHttpServer())
       .post(API_PREFIX + API_PATH.BLOGS)
       .send({ ...createBlogInput, name: true })
-      // .set('authorization', authHeader)
+      .set('authorization', basicAuthHeader)
       .expect(HttpStatus.BAD_REQUEST);
 
     expect(response.body).toEqual({
@@ -167,7 +168,7 @@ describe('Blogs Negative (e2e)', () => {
     const response = await request(app.getHttpServer())
       .post(API_PREFIX + API_PATH.BLOGS)
       .send({ ...createBlogInput, name: 'name567890123456' })
-      // .set('authorization', authHeader)
+      .set('authorization', basicAuthHeader)
       .expect(HttpStatus.BAD_REQUEST);
 
     expect(response.body).toEqual({
@@ -184,7 +185,7 @@ describe('Blogs Negative (e2e)', () => {
     const response = await request(app.getHttpServer())
       .post(API_PREFIX + API_PATH.BLOGS)
       .send({ ...createBlogInput, name: 'name567890123456' })
-      // .set('authorization', authHeader)
+      .set('authorization', basicAuthHeader)
       .expect(HttpStatus.BAD_REQUEST);
 
     expect(response.body).toEqual({
@@ -207,7 +208,7 @@ describe('Blogs Negative (e2e)', () => {
     const editResponse = await request(app.getHttpServer())
       .put(`${API_PREFIX}${API_PATH.BLOGS}/${createdBlog.id}`)
       .send({ ...createBlogInput, name: '' })
-      // .set('authorization', authHeader)
+      .set('authorization', basicAuthHeader)
       .expect(HttpStatus.BAD_REQUEST);
 
     expect(editResponse.body).toEqual({
@@ -230,7 +231,7 @@ describe('Blogs Negative (e2e)', () => {
     const editResponse = await request(app.getHttpServer())
       .put(`${API_PREFIX}${API_PATH.BLOGS}/${createdBlog.id}`)
       .send({ ...createBlogInput, name: 'name567890123456' })
-      // .set('authorization', authHeader)
+      .set('authorization', basicAuthHeader)
       .expect(HttpStatus.BAD_REQUEST);
 
     expect(editResponse.body).toEqual({
@@ -303,7 +304,7 @@ describe('Blogs Negative (e2e)', () => {
 
     const response = await request(app.getHttpServer())
       .put(`${API_PREFIX}${API_PATH.BLOGS}/${createdBlog.id}`)
-      // .set('authorization', authHeader)
+      .set('authorization', basicAuthHeader)
       .send({ ...createBlogInput, websiteUrl: 'http://localhost:8000/' })
       .expect(HttpStatus.BAD_REQUEST);
 
