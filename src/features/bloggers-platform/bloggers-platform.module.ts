@@ -15,6 +15,7 @@ import { Comment, CommentSchema } from './domain/comment.entity';
 import { CommentsRepository } from './repositories/comments.repository';
 import { CreateCommentUseCase } from './application/usecases/create-comment.usecase';
 import { UserPlatformModule } from '../user-platform/user-platform.module';
+import { CommentsController } from './api/comments.controller';
 
 @Module({
   imports: [
@@ -25,7 +26,7 @@ import { UserPlatformModule } from '../user-platform/user-platform.module';
       { name: Comment.name, schema: CommentSchema },
     ]),
   ],
-  controllers: [BlogsController, PostsController],
+  controllers: [BlogsController, PostsController, CommentsController],
   providers: [
     BlogsService,
     BlogsRepository,

@@ -17,6 +17,7 @@ import {
   createUserInput,
 } from '../../../helpers/inputs';
 import { CommentViewDto } from '../../../../src/features/bloggers-platform/api/view-dto/comment.view-dto';
+import { CommentsTestManager } from '../../../helpers/comments-test-manager';
 
 const commentEntity: CommentViewDto = {
   id: '',
@@ -39,6 +40,7 @@ describe('Comments Positive (e2e)', () => {
   let blogsTestManager: BlogsTestManager;
   let postsTestManager: PostsTestManager;
   let usersTestManager: UsersTestManager;
+  let commentsTestManager: CommentsTestManager;
 
   beforeAll(async () => {
     mongoServer = await MongoMemoryServer.create();
@@ -54,6 +56,7 @@ describe('Comments Positive (e2e)', () => {
     blogsTestManager = new BlogsTestManager(app);
     postsTestManager = new PostsTestManager(app);
     usersTestManager = new UsersTestManager(app);
+    commentsTestManager = new CommentsTestManager(app);
 
     await app.init();
   });
@@ -101,6 +104,40 @@ describe('Comments Positive (e2e)', () => {
         ...commentEntity.commentatorInfo,
         userId: expect.any(String),
       },
+      id: expect.any(String),
+      createdAt: expect.any(String),
+      likesInfo: {
+        likesCount: 0,
+        dislikesCount: 0,
+        myStatus: 'None',
+      },
+    });
+  });
+
+  it('should GET a comment successfully', async () => {
+    const user = await usersTestManager.createUser(createUserInput);
+    const blog = await blogsTestManager.createBlog(createBlogInput);
+    const post = await postsTestManager.createPost({
+      ...createPostInput,
+      blogId: blog.id,
+    });
+    const { accessToken: token } = await usersTestManager.login(
+      user.login,
+      createUserInput.password,
+    );
+    const comment = await commentsTestManager.createComment(
+      { content: 'This is a very long comment' },
+      token,
+      post.id,
+    );
+
+    const response = await request(app.getHttpServer())
+      .get(API_PREFIX + API_PATH.COMMENTS + `/${comment.id}`)
+      .expect(HttpStatus.OK);
+
+    expect(response.body).toEqual({
+      ...comment,
+      content: comment.content,
       id: expect.any(String),
       createdAt: expect.any(String),
       likesInfo: {
