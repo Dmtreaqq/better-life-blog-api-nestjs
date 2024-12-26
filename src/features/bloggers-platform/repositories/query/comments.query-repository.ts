@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { CommentModelType } from '../../domain/comment.entity';
 import { CommentViewDto } from '../../api/view-dto/comment.view-dto';
@@ -41,7 +41,7 @@ export class CommentsQueryRepository {
     const comment = await this.CommentModel.findById(id);
 
     if (!comment) {
-      throw new BadRequestException([
+      throw new NotFoundException([
         {
           message: 'Comment not found',
           field: 'id',

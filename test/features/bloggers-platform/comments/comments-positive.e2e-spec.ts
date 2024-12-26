@@ -147,4 +147,31 @@ describe('Comments Positive (e2e)', () => {
       },
     });
   });
+
+  it('should DELETE a comment successfully', async () => {
+    const user = await usersTestManager.createUser(createUserInput);
+    const blog = await blogsTestManager.createBlog(createBlogInput);
+    const post = await postsTestManager.createPost({
+      ...createPostInput,
+      blogId: blog.id,
+    });
+    const { accessToken: token } = await usersTestManager.login(
+      user.login,
+      createUserInput.password,
+    );
+    const comment = await commentsTestManager.createComment(
+      { content: 'This is a very long comment' },
+      token,
+      post.id,
+    );
+
+    await request(app.getHttpServer())
+      .del(API_PREFIX + API_PATH.COMMENTS + `/${comment.id}`)
+      .set('authorization', `Bearer ${token}`)
+      .expect(HttpStatus.NO_CONTENT);
+
+    await request(app.getHttpServer())
+      .get(API_PREFIX + API_PATH.COMMENTS + `/${comment.id}`)
+      .expect(HttpStatus.NOT_FOUND);
+  });
 });

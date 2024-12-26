@@ -16,6 +16,9 @@ import { CommentsRepository } from './repositories/comments.repository';
 import { CreateCommentUseCase } from './application/usecases/create-comment.usecase';
 import { UserPlatformModule } from '../user-platform/user-platform.module';
 import { CommentsController } from './api/comments.controller';
+import { DeleteCommentUseCase } from './application/usecases/delete-comment.usecase';
+
+const useCases = [CreateCommentUseCase, DeleteCommentUseCase];
 
 @Module({
   imports: [
@@ -36,7 +39,7 @@ import { CommentsController } from './api/comments.controller';
     PostsRepository,
     CommentsQueryRepository,
     CommentsRepository,
-    CreateCommentUseCase,
+    ...useCases,
   ],
   exports: [MongooseModule],
 })

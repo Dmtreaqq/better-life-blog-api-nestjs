@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import {
   Comment,
@@ -18,6 +22,19 @@ export class CommentsRepository {
 
   async getById(id: string) {
     return this.CommentModel.findById(id);
+  }
+
+  async deleteComment(comment: CommentDocument) {
+    const result = await comment.deleteOne();
+
+    if (result.deletedCount !== 1) {
+      throw new BadRequestException([
+        {
+          message: 'Entity was not deleted for some reason',
+          field: 'id',
+        },
+      ]);
+    }
   }
 
   async getByIdOrThrow(id: string) {
