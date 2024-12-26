@@ -13,6 +13,7 @@ import { createBlogInput, createPostInput } from '../../../helpers/inputs';
 import { TestingModule as TestModule } from '../../../../src/features/testing/testing.module';
 import { ObjectId } from 'mongodb';
 import { CommonConfig } from '../../../../src/common/common.config';
+import { basicAuthHeader } from '../../../helpers/users-test-manager';
 
 describe('Posts Negative (e2e)', () => {
   let app: INestApplication;
@@ -69,7 +70,7 @@ describe('Posts Negative (e2e)', () => {
   it('should return 404 for DELETE not existing post', async () => {
     await request(app.getHttpServer())
       .delete(`${API_PREFIX}${API_PATH.POSTS}/${randomObjectId}`)
-      // .set('authorization', authHeader)
+      .set('authorization', basicAuthHeader)
       .expect(HttpStatus.NOT_FOUND);
   });
 
@@ -79,7 +80,7 @@ describe('Posts Negative (e2e)', () => {
     await request(app.getHttpServer())
       .put(`${API_PREFIX}${API_PATH.POSTS}/${randomObjectId}`)
       .send({ ...createPostInput, blogId: blog.id })
-      // .set('authorization', authHeader)
+      .set('authorization', basicAuthHeader)
       .expect(HttpStatus.NOT_FOUND);
   });
 
@@ -89,7 +90,7 @@ describe('Posts Negative (e2e)', () => {
     const response = await request(app.getHttpServer())
       .post(API_PREFIX + API_PATH.POSTS)
       .send({ ...createPostInput, blogId: blog.id, title: '' })
-      // .set('authorization', authHeader)
+      .set('authorization', basicAuthHeader)
       .expect(HttpStatus.BAD_REQUEST);
 
     expect(response.body).toEqual({
@@ -111,7 +112,7 @@ describe('Posts Negative (e2e)', () => {
         blogId: blog.id,
         title: '31sym_789012345678901234567jjkkjjjkjk8901',
       })
-      // .set('authorization', authHeader)
+      .set('authorization', basicAuthHeader)
       .expect(HttpStatus.BAD_REQUEST);
 
     expect(response.body).toEqual({
@@ -128,7 +129,7 @@ describe('Posts Negative (e2e)', () => {
     const response = await request(app.getHttpServer())
       .post(API_PREFIX + API_PATH.POSTS)
       .send({ ...createPostInput, blogId: randomObjectId })
-      // .set('authorization', authHeader)
+      .set('authorization', basicAuthHeader)
       .expect(HttpStatus.BAD_REQUEST);
 
     expect(response.body).toEqual({
@@ -145,7 +146,7 @@ describe('Posts Negative (e2e)', () => {
     const response = await request(app.getHttpServer())
       .post(API_PREFIX + API_PATH.POSTS)
       .send({ ...createPostInput, blogId: '123' })
-      // .set('authorization', authHeader)
+      .set('authorization', basicAuthHeader)
       .expect(HttpStatus.BAD_REQUEST);
 
     expect(response.body).toEqual({
@@ -168,7 +169,7 @@ describe('Posts Negative (e2e)', () => {
     const response = await request(app.getHttpServer())
       .put(`${API_PREFIX}${API_PATH.POSTS}/${post.id}`)
       .send({ ...createPostInput, blogId: '123' })
-      // .set('authorization', authHeader)
+      .set('authorization', basicAuthHeader)
       .expect(HttpStatus.BAD_REQUEST);
 
     expect(response.body).toEqual({
@@ -191,7 +192,7 @@ describe('Posts Negative (e2e)', () => {
     const editResponse = await request(app.getHttpServer())
       .put(`${API_PREFIX}${API_PATH.POSTS}/${post.id}`)
       .send({ ...createPostInput, blogId: blog.id, title: '' })
-      // .set('authorization', authHeader)
+      .set('authorization', basicAuthHeader)
       .expect(HttpStatus.BAD_REQUEST);
 
     expect(editResponse.body).toEqual({
@@ -218,7 +219,7 @@ describe('Posts Negative (e2e)', () => {
         blogId: blog.id,
         title: '31sym_789012345678901234567jjkkjjjkjk8901',
       })
-      // .set('authorization', authHeader)
+      .set('authorization', basicAuthHeader)
       .expect(HttpStatus.BAD_REQUEST);
 
     expect(editResponse.body).toEqual({
@@ -237,7 +238,7 @@ describe('Posts Negative (e2e)', () => {
     const editResponse = await request(app.getHttpServer())
       .put(`${API_PREFIX}${API_PATH.POSTS}/12345`)
       .send({ ...createPostInput, blogId: blog.id, title: 'new title' })
-      // .set('authorization', authHeader)
+      .set('authorization', basicAuthHeader)
       .expect(HttpStatus.BAD_REQUEST);
 
     expect(editResponse.body).toEqual({
@@ -253,7 +254,7 @@ describe('Posts Negative (e2e)', () => {
   it('should return 400 for incorrect POST_ID length while DELETE post', async () => {
     const editResponse = await request(app.getHttpServer())
       .delete(`${API_PREFIX}${API_PATH.POSTS}/12345`)
-      // .set('authorization', authHeader)
+      .set('authorization', basicAuthHeader)
       .expect(HttpStatus.BAD_REQUEST);
 
     expect(editResponse.body).toEqual({

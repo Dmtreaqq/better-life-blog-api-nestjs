@@ -27,6 +27,8 @@ import { CommandBus } from '@nestjs/cqrs';
 import { CreateCommentCommand } from '../application/usecases/create-comment.usecase';
 import { GetUser } from '../../../common/decorators/get-user.decorator';
 import { UserContext } from '../../../common/dto/user-context.dto';
+import { BasicAuthGuard } from '../../../common/guards/basic-auth.guard';
+import { JwtOptionalAuthGuard } from '../../../common/guards/jwt-optional-auth.guard';
 
 @Controller('posts')
 export class PostsController {
@@ -37,6 +39,7 @@ export class PostsController {
     private commandBus: CommandBus,
   ) {}
 
+  @UseGuards(JwtOptionalAuthGuard)
   @Get(':postId/comments')
   async getCommentsForPost(
     @Param() params: IdInputDto,
@@ -45,6 +48,7 @@ export class PostsController {
     return this.commentsQueryRepository.getAll(query, params.id);
   }
 
+  @UseGuards(JwtOptionalAuthGuard)
   @Get()
   async getAll(
     @Query() query: PostQueryGetParams,
@@ -52,11 +56,13 @@ export class PostsController {
     return this.postsQueryRepository.getAll(query);
   }
 
+  @UseGuards(JwtOptionalAuthGuard)
   @Get(':id')
   async getById(@Param() params: IdInputDto): Promise<PostViewDto> {
     return this.postsQueryRepository.getByIdOrThrow(params.id);
   }
 
+  @UseGuards(BasicAuthGuard)
   @Post()
   async createPost(@Body() dto: CreatePostInputDto) {
     const postId = await this.postsService.createPost(dto);
@@ -64,12 +70,14 @@ export class PostsController {
     return this.postsQueryRepository.getByIdOrThrow(postId);
   }
 
+  @UseGuards(BasicAuthGuard)
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   async deleteById(@Param() params: IdInputDto) {
     await this.postsService.deletePost(params.id);
   }
 
+  @UseGuards(BasicAuthGuard)
   @Put(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   async editPost(@Param() params: IdInputDto, @Body() dto: UpdatePostInputDto) {

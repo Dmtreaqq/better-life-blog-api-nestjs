@@ -8,7 +8,7 @@ import { API_PREFIX } from '../../../../src/settings/global-prefix.setup';
 import { appSetup } from '../../../../src/settings/app.setup';
 import { BlogsTestManager } from '../../../helpers/blogs-test-manager';
 import { ObjectId } from 'mongodb';
-import { createBlogInput } from '../../../helpers/inputs';
+import { createBlogInput, createPostInput } from '../../../helpers/inputs';
 import { TestingModule as TestModule } from '../../../../src/features/testing/testing.module';
 import { CommonConfig } from '../../../../src/common/common.config';
 import { basicAuthHeader } from '../../../helpers/users-test-manager';
@@ -139,13 +139,24 @@ describe('Blogs Negative (e2e)', () => {
     });
   });
 
-  // it('should return 404 for POST post for a not existing blog', async () => {
-  //   await request(app.getHttpServer())
-  //     .post(`${API_PREFIX}${API_PATH.BLOGS}/${randomId}/posts`)
-  //     .send({ ...postInput })
-      // .set('authorization', basicAuthHeader)
-  //     .expect(HttpStatus.NOT_FOUND);
-  // })
+  it('should return 400 for POST post for a not existing blog', async () => {
+    const randomObjectId = new ObjectId();
+
+    const response = await request(app.getHttpServer())
+      .post(`${API_PREFIX}${API_PATH.BLOGS}/${randomId}/posts`)
+      .send({ ...createPostInput, blogId: randomObjectId })
+      .set('authorization', basicAuthHeader)
+      .expect(HttpStatus.BAD_REQUEST);
+
+    expect(response.body).toEqual({
+      errorsMessages: [
+        {
+          message: 'Blog not found',
+          field: 'blogId',
+        },
+      ],
+    });
+  });
 
   it('should return 400 for incorrect NAME type while POST blog', async () => {
     const response = await request(app.getHttpServer())
@@ -244,32 +255,38 @@ describe('Blogs Negative (e2e)', () => {
     });
   });
 
-  // it('should return 401 when no Auth Header for POST blog request', async () => {
-  //   await request(app.getHttpServer())
-  //     .post(API_PREFIX + API_PATH.BLOGS)
-  //     .send(blogInput)
-  //     .expect(HTTP_STATUSES.NOT_AUTHORIZED_401);
-  // })
+  it('should return 401 when no Auth Header for POST blog request', async () => {
+    await request(app.getHttpServer())
+      .post(API_PREFIX + API_PATH.BLOGS)
+      .send(createBlogInput)
+      .expect(HttpStatus.UNAUTHORIZED);
+  });
 
-  // it('should return 401 when no Auth Header for PUT blog request', async () => {
-  //   await request(app.getHttpServer())
-  //     .put(`${API_PREFIX}${API_PATH.BLOGS}/${createdBlogId}`)
-  //     .send(blogInput)
-  //     .expect(HTTP_STATUSES.NOT_AUTHORIZED_401);
-  // })
+  it('should return 401 when no Auth Header for PUT blog request', async () => {
+    const blog = await blogsTestManager.createBlog(createBlogInput);
 
-  // it('should return 401 when no Auth Header for DELETE blog request', async () => {
-  //   await request(app.getHttpServer())
-  //     .delete(`${API_PREFIX}${API_PATH.BLOGS}/${createdBlogId}`)
-  //     .expect(HTTP_STATUSES.NOT_AUTHORIZED_401);
-  // })
+    await request(app.getHttpServer())
+      .put(`${API_PREFIX}${API_PATH.BLOGS}/${blog.id}`)
+      .send(createBlogInput)
+      .expect(HttpStatus.UNAUTHORIZED);
+  });
 
-  // it('should return 401 when Auth Header is incorrect for DELETE blog request', async () => {
-  //   await request(app.getHttpServer())
-  //     .delete(`${API_PREFIX}${API_PATH.BLOGS}/${createdBlogId}`)
-  //     .set('authorization', 'test')
-  //     .expect(HTTP_STATUSES.NOT_AUTHORIZED_401);
-  // })
+  it('should return 401 when no Auth Header for DELETE blog request', async () => {
+    const blog = await blogsTestManager.createBlog(createBlogInput);
+
+    await request(app.getHttpServer())
+      .delete(`${API_PREFIX}${API_PATH.BLOGS}/${blog.id}`)
+      .expect(HttpStatus.UNAUTHORIZED);
+  });
+
+  it('should return 401 when Auth Header is incorrect for DELETE blog request', async () => {
+    const blog = await blogsTestManager.createBlog(createBlogInput);
+
+    await request(app.getHttpServer())
+      .delete(`${API_PREFIX}${API_PATH.BLOGS}/${blog.id}`)
+      .set('authorization', 'test')
+      .expect(HttpStatus.UNAUTHORIZED);
+  });
 
   it('should return 400 while GET posts for a not existing blog', async () => {
     const objectId = new ObjectId();

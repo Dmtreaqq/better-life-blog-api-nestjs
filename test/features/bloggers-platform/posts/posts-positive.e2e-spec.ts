@@ -3,7 +3,6 @@ import { MongoMemoryServer } from 'mongodb-memory-server';
 import { BlogsTestManager } from '../../../helpers/blogs-test-manager';
 import { PostsTestManager } from '../../../helpers/posts-test-manager';
 import { Test, TestingModule } from '@nestjs/testing';
-import { BloggersPlatformModule } from '../../../../src/features/bloggers-platform/bloggers-platform.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { appSetup } from '../../../../src/settings/app.setup';
 import * as request from 'supertest';
@@ -14,6 +13,7 @@ import { UpdatePostInputDto } from '../../../../src/features/bloggers-platform/a
 import { ReactionStatus } from '../../../../src/features/bloggers-platform/api/enums/ReactionStatus';
 import { TestingModule as TestModule } from '../../../../src/features/testing/testing.module';
 import { CommonConfig } from '../../../../src/common/common.config';
+import { basicAuthHeader } from '../../../helpers/users-test-manager';
 
 describe('Posts Positive (e2e)', () => {
   let app: INestApplication;
@@ -26,10 +26,7 @@ describe('Posts Positive (e2e)', () => {
     const mongoUri = mongoServer.getUri();
 
     const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [
-        TestModule,
-        MongooseModule.forRoot(mongoUri),
-      ],
+      imports: [TestModule, MongooseModule.forRoot(mongoUri)],
     }).compile();
 
     app = moduleFixture.createNestApplication();
@@ -68,7 +65,7 @@ describe('Posts Positive (e2e)', () => {
     const response = await request(app.getHttpServer())
       .post(API_PREFIX + API_PATH.POSTS)
       .send({ ...createPostInput, blogId: blog.id })
-      // .set('authorization', authHeader)
+      .set('authorization', basicAuthHeader)
       .expect(HttpStatus.CREATED);
 
     expect(response.body).toEqual({
@@ -155,7 +152,7 @@ describe('Posts Positive (e2e)', () => {
     await request(app.getHttpServer())
       .put(`${API_PREFIX}${API_PATH.POSTS}/${post.id}`)
       .send(editedPostInput)
-      // .set('authorization', authHeader)
+      .set('authorization', basicAuthHeader)
       .expect(HttpStatus.NO_CONTENT);
 
     const getResponse = await request(app.getHttpServer())
@@ -183,7 +180,7 @@ describe('Posts Positive (e2e)', () => {
 
     await request(app.getHttpServer())
       .delete(`${API_PREFIX}${API_PATH.POSTS}/${post.id}`)
-      // .set('authorization', authHeader)
+      .set('authorization', basicAuthHeader)
       .expect(HttpStatus.NO_CONTENT);
 
     await request(app.getHttpServer())
