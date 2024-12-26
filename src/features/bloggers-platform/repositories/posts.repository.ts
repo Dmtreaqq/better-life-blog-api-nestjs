@@ -14,6 +14,10 @@ export class PostsRepository {
     await post.save();
   }
 
+  async getById(id: string): Promise<PostDocument | null> {
+    return this.PostModel.findById(id);
+  }
+
   async getByIdOrThrow(id: string): Promise<PostDocument> {
     const post = await this.PostModel.findById(id);
 

@@ -47,8 +47,8 @@ export class UsersTestManager {
     statusCode: number = HttpStatus.OK,
   ): Promise<{ accessToken: string }> {
     const response = await request(this.app.getHttpServer())
-      .post(`/${API_PREFIX}/auth/login`)
-      .send({ login, password })
+      .post(`${API_PREFIX}/auth/login`)
+      .send({ loginOrEmail: login, password })
       .expect(statusCode);
 
     return {

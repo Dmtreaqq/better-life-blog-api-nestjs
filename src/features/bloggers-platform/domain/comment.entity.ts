@@ -30,7 +30,9 @@ export class Comment {
   static createInstance(dto: CreateCommentDto): CommentDocument {
     const comment = new this();
 
+    comment.postId = dto.postId;
     comment.content = dto.content;
+    comment.commentatorId = dto.userId;
 
     return comment as CommentDocument;
   }

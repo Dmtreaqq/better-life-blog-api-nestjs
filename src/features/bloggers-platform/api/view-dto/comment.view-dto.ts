@@ -23,14 +23,17 @@ export class CommentViewDto {
     const dto = new CommentViewDto();
 
     dto.id = comment.id;
-    dto.commentatorInfo.userId = comment.commentatorId;
-    dto.commentatorInfo.userLogin = comment.commentatorLogin;
+    dto.commentatorInfo = {
+      userId: comment.commentatorId,
+      userLogin: comment.commentatorLogin,
+    };
     dto.createdAt = comment.createdAt;
     dto.likesInfo = {
       likesCount: 0,
       dislikesCount: 0,
       myStatus: ReactionStatus.None,
     };
+    dto.content = comment.content;
 
     return dto;
   }

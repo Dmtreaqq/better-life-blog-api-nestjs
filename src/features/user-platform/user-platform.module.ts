@@ -46,6 +46,6 @@ import { UserPlatformConfig } from './config/user-platform.config';
     AuthService,
     LocalStrategy,
   ],
-  exports: [MongooseModule],
+  exports: [MongooseModule, UsersRepository],
 })
 export class UserPlatformModule {}

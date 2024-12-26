@@ -9,6 +9,7 @@ import {
   Post,
   Put,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { PostViewDto } from './view-dto/post.view-dto';
 import { PostsQueryRepository } from '../repositories/query/posts.query-repository';
@@ -20,6 +21,12 @@ import { UpdatePostInputDto } from './input-dto/update-post-input.dto';
 import { CommentsQueryRepository } from '../repositories/query/comments.query-repository';
 import { CommentsQueryGetParams } from './input-dto/get-comments-query.dto';
 import { IdInputDto } from '../../../common/dto/id.input-dto';
+import { JwtAuthGuard } from '../../../common/guards/jwt-auth.guard';
+import { CreateCommentInputDto } from './input-dto/create-comment-input.dto';
+import { CommandBus } from '@nestjs/cqrs';
+import { CreateCommentCommand } from '../application/usecases/create-comment.usecase';
+import { GetUser } from '../../../common/decorators/get-user.decorator';
+import { UserContext } from '../../../common/dto/user-context.dto';
 
 @Controller('posts')
 export class PostsController {
@@ -27,6 +34,7 @@ export class PostsController {
     private postsQueryRepository: PostsQueryRepository,
     private postsService: PostsService,
     private commentsQueryRepository: CommentsQueryRepository,
+    private commandBus: CommandBus,
   ) {}
 
   @Get(':postId/comments')
@@ -66,5 +74,23 @@ export class PostsController {
   @HttpCode(HttpStatus.NO_CONTENT)
   async editPost(@Param() params: IdInputDto, @Body() dto: UpdatePostInputDto) {
     return this.postsService.editPost(params.id, dto);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post(':id/comments')
+  async createCommentForPost(
+    @Body() commentInputDto: CreateCommentInputDto,
+    @Param() params: IdInputDto,
+    @GetUser() userContext: UserContext,
+  ) {
+    const commentId = await this.commandBus.execute(
+      new CreateCommentCommand({
+        ...commentInputDto,
+        postId: params.id,
+        userId: userContext.id,
+      }),
+    );
+
+    return this.commentsQueryRepository.getByIdOrThrow(commentId);
   }
 }

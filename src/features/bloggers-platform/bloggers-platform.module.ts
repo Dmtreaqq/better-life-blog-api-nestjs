@@ -12,9 +12,13 @@ import { PostsRepository } from './repositories/posts.repository';
 import { PostsService } from './application/posts.service';
 import { CommentsQueryRepository } from './repositories/query/comments.query-repository';
 import { Comment, CommentSchema } from './domain/comment.entity';
+import { CommentsRepository } from './repositories/comments.repository';
+import { CreateCommentUseCase } from './application/usecases/create-comment.usecase';
+import { UserPlatformModule } from '../user-platform/user-platform.module';
 
 @Module({
   imports: [
+    UserPlatformModule,
     MongooseModule.forFeature([
       { name: 'Blog', schema: BlogSchema },
       { name: Post.name, schema: PostSchema },
@@ -30,6 +34,8 @@ import { Comment, CommentSchema } from './domain/comment.entity';
     PostsQueryRepository,
     PostsRepository,
     CommentsQueryRepository,
+    CommentsRepository,
+    CreateCommentUseCase,
   ],
   exports: [MongooseModule],
 })

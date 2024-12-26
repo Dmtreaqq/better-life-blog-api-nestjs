@@ -27,6 +27,7 @@ class AllExceptionsFilter implements ExceptionFilter {
         timestamp: new Date().toISOString(),
         path: request.url,
         message: (exception as any).message || 'Internal server error',
+        stackTrace: (exception as any).stackTrace,
       });
     } else {
       response.status(status).json({
