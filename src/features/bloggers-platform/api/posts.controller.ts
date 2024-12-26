@@ -40,7 +40,7 @@ export class PostsController {
   ) {}
 
   @UseGuards(JwtOptionalAuthGuard)
-  @Get(':postId/comments')
+  @Get(':id/comments')
   async getCommentsForPost(
     @Param() params: IdInputDto,
     @Query() query: CommentsQueryGetParams,
