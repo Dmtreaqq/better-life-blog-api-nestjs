@@ -31,10 +31,10 @@ import { BasicAuthGuard } from '../../../common/guards/basic-auth.guard';
 import { JwtOptionalAuthGuard } from '../../../common/guards/jwt-optional-auth.guard';
 import { InjectModel } from '@nestjs/mongoose';
 import { Reaction, ReactionModelType } from '../domain/reaction.entity';
-import { ReactionModelStatus, ReactionStatus } from './enums/ReactionStatus';
-import { ReactionRelationType } from './enums/ReactionRelationType';
-import { PostModelType } from '../domain/post.entity';
 import { PostsRepository } from '../repositories/posts.repository';
+import { CreateUpdateReactionInput } from './input-dto/create-update-reaction.input.dto';
+import { UpdateReactionCommand } from '../application/usecases/update-reaction.usecase';
+import { ReactionRelationType } from './enums/ReactionRelationType';
 
 @Controller('posts')
 export class PostsController {
@@ -116,19 +116,15 @@ export class PostsController {
   async setLikeStatus(
     @Param() params: IdInputDto,
     @GetUser() userContext: UserContext,
+    @Body() dto: CreateUpdateReactionInput,
   ) {
-    const reaction = this.ReactionModel.createInstance({
-      reactionStatus: ReactionModelStatus.Like,
-      reactionRelationType: ReactionRelationType.Post,
-      userId: userContext.id,
-      commentOrPostId: params.id,
-    });
-
-    // await reaction.save();
-    const post = await this.postsRepository.getById(params.id);
-
-    post.reactions.push(reaction);
-
-    await this.postsRepository.save(post);
+    await this.commandBus.execute(
+      new UpdateReactionCommand({
+        userId: userContext.id,
+        commentOrPostId: params.id,
+        reactionStatus: dto.likeStatus,
+        reactionRelationType: ReactionRelationType.Post,
+      }),
+    );
   }
 }

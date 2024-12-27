@@ -19,11 +19,13 @@ import { CommentsController } from './api/comments.controller';
 import { DeleteCommentUseCase } from './application/usecases/delete-comment.usecase';
 import { UpdateCommentUseCase } from './application/usecases/update-comment.usecase';
 import { Reaction, ReactionSchema } from './domain/reaction.entity';
+import { UpdateReactionUseCase } from './application/usecases/update-reaction.usecase';
 
 const useCases = [
   CreateCommentUseCase,
   DeleteCommentUseCase,
   UpdateCommentUseCase,
+  UpdateReactionUseCase,
 ];
 
 @Module({

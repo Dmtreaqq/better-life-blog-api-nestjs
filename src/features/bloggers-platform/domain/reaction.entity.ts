@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Model } from 'mongoose';
-import { CreateReactionDto } from '../api/input-dto/create-reaction.dto';
+import { CreateReactionDto } from '../dto/create-reaction.dto';
 import { ReactionModelStatus } from '../api/enums/ReactionStatus';
 import { ReactionRelationType } from '../api/enums/ReactionRelationType';
 
@@ -26,7 +26,7 @@ export class Reaction {
 
     like.userId = dto.userId;
     like.commentOrPostId = dto.commentOrPostId;
-    like.reactionStatus = dto.reactionStatus;
+    like.reactionStatus = dto.reactionStatus as any;
     like.reactionRelationType = dto.reactionRelationType;
 
     return like as ReactionDocument;

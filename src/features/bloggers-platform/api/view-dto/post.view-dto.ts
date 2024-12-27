@@ -1,5 +1,6 @@
 import { PostDocument } from '../../domain/post.entity';
-import { ReactionStatus } from '../enums/ReactionStatus';
+import { ReactionModelStatus, ReactionStatus } from '../enums/ReactionStatus';
+import { ReactionDocument } from '../../domain/reaction.entity';
 
 class LikesDetails {
   addedAt: string;
@@ -37,12 +38,40 @@ export class PostViewDto {
     dto.createdAt = post.createdAt;
 
     dto.extendedLikesInfo = {
-      likesCount: post.reactions.length,
-      dislikesCount: 0,
+      likesCount: this.countLikes(post.reactions as any),
+      dislikesCount: this.countDislikes(post.reactions as any),
       myStatus: ReactionStatus.None,
-      newestLikes: [],
+      newestLikes: this.countThreeLastLikesWithDetails(
+        post.reactions as any,
+      ) as any,
     };
 
     return dto;
+  }
+
+  private static countLikes(reactions: ReactionDocument[]): number {
+    const likes = reactions.filter(
+      (reaction) => reaction.reactionStatus === ReactionModelStatus.Like,
+    );
+
+    return likes.length;
+  }
+
+  private static countDislikes(reactions: ReactionDocument[]): number {
+    const likes = reactions.filter(
+      (reaction) => reaction.reactionStatus === ReactionModelStatus.Dislike,
+    );
+
+    return likes.length;
+  }
+
+  private static countThreeLastLikesWithDetails(
+    reactions: ReactionDocument[],
+  ): ReactionDocument[] {
+    const likes = reactions.filter(
+      (reaction) => reaction.reactionStatus === ReactionModelStatus.Like,
+    );
+
+    return likes.slice(-3).reverse();
   }
 }
