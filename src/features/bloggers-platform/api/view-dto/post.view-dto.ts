@@ -37,7 +37,7 @@ export class PostViewDto {
     dto.createdAt = post.createdAt;
 
     dto.extendedLikesInfo = {
-      likesCount: 0,
+      likesCount: post.reactions.length,
       dislikesCount: 0,
       myStatus: ReactionStatus.None,
       newestLikes: [],

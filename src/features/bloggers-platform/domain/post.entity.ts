@@ -1,6 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument, Model } from 'mongoose';
+import { HydratedDocument, Model, Types } from 'mongoose';
 import { CreatePostDto } from '../dto/create-post.dto';
+import { Reaction, ReactionSchema } from './reaction.entity';
 
 @Schema({ timestamps: true })
 export class Post {
@@ -22,6 +23,9 @@ export class Post {
   @Prop({ type: Date })
   createdAt: Date;
 
+  @Prop([ReactionSchema])
+  reactions: Reaction[];
+
   static createInstance(dto: CreatePostDto): PostDocument {
     const post = new this();
 
@@ -38,6 +42,10 @@ export class Post {
 export const PostSchema = SchemaFactory.createForClass(Post);
 PostSchema.loadClass(Post);
 
-export type PostDocument = HydratedDocument<Post>;
+export type PostDocumentOverride = {
+  reactions: Types.DocumentArray<Reaction>;
+};
+
+export type PostDocument = HydratedDocument<Post, PostDocumentOverride>;
 
 export type PostModelType = Model<PostDocument> & typeof Post;

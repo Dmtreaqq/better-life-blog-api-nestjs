@@ -29,6 +29,12 @@ import { GetUser } from '../../../common/decorators/get-user.decorator';
 import { UserContext } from '../../../common/dto/user-context.dto';
 import { BasicAuthGuard } from '../../../common/guards/basic-auth.guard';
 import { JwtOptionalAuthGuard } from '../../../common/guards/jwt-optional-auth.guard';
+import { InjectModel } from '@nestjs/mongoose';
+import { Reaction, ReactionModelType } from '../domain/reaction.entity';
+import { ReactionModelStatus, ReactionStatus } from './enums/ReactionStatus';
+import { ReactionRelationType } from './enums/ReactionRelationType';
+import { PostModelType } from '../domain/post.entity';
+import { PostsRepository } from '../repositories/posts.repository';
 
 @Controller('posts')
 export class PostsController {
@@ -37,6 +43,8 @@ export class PostsController {
     private postsService: PostsService,
     private commentsQueryRepository: CommentsQueryRepository,
     private commandBus: CommandBus,
+    @InjectModel(Reaction.name) private ReactionModel: ReactionModelType,
+    private postsRepository: PostsRepository,
   ) {}
 
   @UseGuards(JwtOptionalAuthGuard)
@@ -100,5 +108,27 @@ export class PostsController {
     );
 
     return this.commentsQueryRepository.getByIdOrThrow(commentId);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @Put(':id/like-status')
+  async setLikeStatus(
+    @Param() params: IdInputDto,
+    @GetUser() userContext: UserContext,
+  ) {
+    const reaction = this.ReactionModel.createInstance({
+      reactionStatus: ReactionModelStatus.Like,
+      reactionRelationType: ReactionRelationType.Post,
+      userId: userContext.id,
+      commentOrPostId: params.id,
+    });
+
+    // await reaction.save();
+    const post = await this.postsRepository.getById(params.id);
+
+    post.reactions.push(reaction);
+
+    await this.postsRepository.save(post);
   }
 }

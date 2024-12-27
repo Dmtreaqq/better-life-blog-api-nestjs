@@ -18,6 +18,7 @@ import { UserPlatformModule } from '../user-platform/user-platform.module';
 import { CommentsController } from './api/comments.controller';
 import { DeleteCommentUseCase } from './application/usecases/delete-comment.usecase';
 import { UpdateCommentUseCase } from './application/usecases/update-comment.usecase';
+import { Reaction, ReactionSchema } from './domain/reaction.entity';
 
 const useCases = [
   CreateCommentUseCase,
@@ -32,6 +33,7 @@ const useCases = [
       { name: 'Blog', schema: BlogSchema },
       { name: Post.name, schema: PostSchema },
       { name: Comment.name, schema: CommentSchema },
+      { name: Reaction.name, schema: ReactionSchema },
     ]),
   ],
   controllers: [BlogsController, PostsController, CommentsController],
