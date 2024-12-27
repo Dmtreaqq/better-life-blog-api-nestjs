@@ -60,14 +60,18 @@ export class PostsController {
   @Get()
   async getAll(
     @Query() query: PostQueryGetParams,
+    @GetUser() userContext: UserContext,
   ): Promise<BasePaginationViewDto<PostViewDto[]>> {
-    return this.postsQueryRepository.getAll(query);
+    return this.postsQueryRepository.getAll(query, '', userContext.id);
   }
 
   @UseGuards(JwtOptionalAuthGuard)
   @Get(':id')
-  async getById(@Param() params: IdInputDto): Promise<PostViewDto> {
-    return this.postsQueryRepository.getByIdOrThrow(params.id);
+  async getById(
+    @Param() params: IdInputDto,
+    @GetUser() userContext: UserContext,
+  ): Promise<PostViewDto> {
+    return this.postsQueryRepository.getByIdOrThrow(params.id, userContext.id);
   }
 
   @UseGuards(BasicAuthGuard)

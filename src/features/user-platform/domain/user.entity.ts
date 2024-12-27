@@ -1,9 +1,24 @@
 import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument, Model } from 'mongoose';
+import { HydratedDocument, Model, Types } from 'mongoose';
 import { CreateUserDto } from '../dto/create-user.dto';
+import { ReactionModelStatus } from '../../bloggers-platform/api/enums/ReactionStatus';
+import { ReactionRelationType } from '../../bloggers-platform/api/enums/ReactionRelationType';
 
 const emailRegex = new RegExp('^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$');
 const loginRegex = new RegExp('^[a-zA-Z0-9_-]*$');
+
+@Schema({ timestamps: true })
+export class UserReaction {
+  @Prop({ type: String, required: true })
+  commentOrPostId: string;
+
+  @Prop({ type: String, enum: ReactionRelationType, required: true })
+  type: ReactionRelationType;
+
+  @Prop({ type: String, enum: ReactionModelStatus, required: true })
+  status: ReactionModelStatus;
+}
+export const UserReactionSchema = SchemaFactory.createForClass(UserReaction);
 
 @Schema({ timestamps: true })
 export class User {
@@ -37,6 +52,9 @@ export class User {
   @Prop({ type: String, default: new Date().toISOString() })
   recoveryCodeExpirationDate: string;
 
+  @Prop([UserReactionSchema])
+  userReactions: UserReaction[];
+
   @Prop({ type: Date })
   createdAt: Date;
 
@@ -59,6 +77,8 @@ export const UserSchema = SchemaFactory.createForClass(User);
 
 UserSchema.loadClass(User);
 
-export type UserDocument = HydratedDocument<User>;
-
+export type UserDocumentOverride = {
+  userReactions: Types.DocumentArray<UserReaction>;
+};
+export type UserDocument = HydratedDocument<User, UserDocumentOverride>;
 export type UserModelType = Model<UserDocument> & typeof User;

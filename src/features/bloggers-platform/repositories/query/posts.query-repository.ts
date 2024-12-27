@@ -4,20 +4,29 @@ import { Post, PostModelType } from '../../domain/post.entity';
 import { PostViewDto } from '../../api/view-dto/post.view-dto';
 import { PostQueryGetParams } from '../../api/input-dto/get-posts-query.dto';
 import { BasePaginationViewDto } from '../../../../common/dto/base-pagination.view-dto';
-import { FilterQuery } from 'mongoose';
+import { FilterQuery, isValidObjectId } from 'mongoose';
 import { BlogModelType } from '../../domain/blog.entity';
-import { isValidObjectId } from 'mongoose';
+import {
+  UserDocument,
+  UserModelType,
+} from '../../../user-platform/domain/user.entity';
+import {
+  ReactionModelStatus,
+  ReactionStatus,
+} from '../../api/enums/ReactionStatus';
 
 @Injectable()
 export class PostsQueryRepository {
   constructor(
     @InjectModel(Post.name) private PostModel: PostModelType,
     @InjectModel('Blog') private BlogModel: BlogModelType,
+    @InjectModel('User') private UserModel: UserModelType,
   ) {}
 
   async getAll(
     query: PostQueryGetParams,
     blogId: string = '',
+    userId?: string,
   ): Promise<BasePaginationViewDto<PostViewDto[]>> {
     if (isValidObjectId(blogId)) {
       const blog = await this.BlogModel.findById(blogId);
@@ -43,7 +52,30 @@ export class PostsQueryRepository {
 
     const totalCount = await this.PostModel.countDocuments(filter);
 
-    const items = posts.map(PostViewDto.mapToView);
+    let user: UserDocument | null = null;
+    let userPostReactionStatus: ReactionStatus = ReactionStatus.None;
+
+    if (userId) {
+      user = await this.UserModel.findById(userId);
+    }
+
+    const findUserReactionForPost = (postId: string): ReactionStatus => {
+      if (!userId) return userPostReactionStatus;
+
+      if (user && user.userReactions?.length > 0) {
+        userPostReactionStatus = user.userReactions.find(
+          (userReact) => userReact.commentOrPostId === postId,
+        ).status as any;
+      } else {
+        return userPostReactionStatus;
+      }
+
+      return userPostReactionStatus;
+    };
+
+    const items = posts.map((post) => {
+      return PostViewDto.mapToView(post, findUserReactionForPost(post.id));
+    });
 
     return BasePaginationViewDto.mapToView({
       page: query.pageNumber,
@@ -53,7 +85,7 @@ export class PostsQueryRepository {
     });
   }
 
-  async getByIdOrThrow(id: string): Promise<PostViewDto> {
+  async getByIdOrThrow(id: string, userId?: string): Promise<PostViewDto> {
     const post = await this.PostModel.findById(id);
 
     if (!post) {
@@ -65,6 +97,18 @@ export class PostsQueryRepository {
       ]);
     }
 
-    return PostViewDto.mapToView(post);
+    let userPostReactionStatus: ReactionModelStatus | null = null;
+    if (userId) {
+      const user = await this.UserModel.findById(userId);
+      if (user && user.userReactions?.length > 0) {
+        const userPostReaction = user.userReactions.find(
+          (userReact) => userReact.commentOrPostId === post.id,
+        );
+
+        userPostReactionStatus = userPostReaction.status;
+      }
+    }
+
+    return PostViewDto.mapToView(post, userPostReactionStatus as any);
   }
 }

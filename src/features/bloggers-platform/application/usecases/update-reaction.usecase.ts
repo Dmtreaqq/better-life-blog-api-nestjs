@@ -35,19 +35,33 @@ export class UpdateReactionUseCase
 
     // IF ITS A POST
     if (reactionRelationType === ReactionRelationType.Post) {
+      // CHECK IF USER ALREADY LEFT A REACTION ON THIS POST
+      const isPostAlreadyReactedByUser = user.userReactions.find(
+        (userReact) => userReact.commentOrPostId === commentOrPostId,
+      );
+
       // IF REACTION FROM THIS USER NOT EXIST CREATE A NEW ONE (LIKE OR DISLIKE)
-      const reaction = this.ReactionModel.createInstance({
-        reactionStatus,
-        reactionRelationType,
-        userId,
-        commentOrPostId,
-      });
+      if (!isPostAlreadyReactedByUser) {
+        const reaction = this.ReactionModel.createInstance({
+          reactionStatus,
+          reactionRelationType,
+          userId,
+          commentOrPostId,
+        });
 
-      const post = await this.postsRepository.getById(commentOrPostId);
+        const post = await this.postsRepository.getById(commentOrPostId);
 
-      post.reactions.push(reaction);
+        user.userReactions.push({
+          status: reaction.reactionStatus,
+          commentOrPostId: post.id,
+          type: ReactionRelationType.Post,
+        });
+        post.reactions.push(reaction);
 
-      await this.postsRepository.save(post);
+        await this.usersRepository.save(user);
+        await this.postsRepository.save(post);
+      }
+
       return;
     }
   }
