@@ -1,6 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument, Model } from 'mongoose';
+import { HydratedDocument, Model, Types } from 'mongoose';
 import { CreateCommentDto } from '../dto/create-comment.dto';
+import { Reaction, ReactionSchema } from './reaction.entity';
 
 const loginRegex = new RegExp('^[a-zA-Z0-9_-]*$');
 
@@ -27,6 +28,9 @@ export class Comment {
   @Prop({ type: Date })
   createdAt: Date;
 
+  @Prop([ReactionSchema])
+  reactions: Reaction[];
+
   static createInstance(dto: CreateCommentDto): CommentDocument {
     const comment = new this();
 
@@ -41,6 +45,13 @@ export class Comment {
 export const CommentSchema = SchemaFactory.createForClass(Comment);
 CommentSchema.loadClass(Comment);
 
-export type CommentDocument = HydratedDocument<Comment>;
+export type CommentDocumentOverride = {
+  reactions: Types.DocumentArray<Reaction>;
+};
+
+export type CommentDocument = HydratedDocument<
+  Comment,
+  CommentDocumentOverride
+>;
 
 export type CommentModelType = Model<CommentDocument> & typeof Comment;

@@ -5,7 +5,8 @@ import {
   Get,
   HttpCode,
   HttpStatus,
-  Param, Put,
+  Param,
+  Put,
   UseGuards,
 } from '@nestjs/common';
 import { CommentsQueryRepository } from '../repositories/query/comments.query-repository';
@@ -19,6 +20,9 @@ import { GetUser } from '../../../common/decorators/get-user.decorator';
 import { UserContext } from '../../../common/dto/user-context.dto';
 import { UpdateCommentInputDto } from './input-dto/update-comment-input.dto';
 import { UpdateCommentCommand } from '../application/usecases/update-comment.usecase';
+import { CreateUpdateReactionInput } from './input-dto/create-update-reaction.input.dto';
+import { UpdateReactionCommand } from '../application/usecases/update-reaction.usecase';
+import { ReactionRelationType } from './enums/ReactionRelationType';
 
 @Controller('comments')
 export class CommentsController {
@@ -29,8 +33,14 @@ export class CommentsController {
 
   @UseGuards(JwtOptionalAuthGuard)
   @Get(':id')
-  async getById(@Param() params: IdInputDto): Promise<CommentViewDto> {
-    return this.commentsQueryRepository.getByIdOrThrow(params.id);
+  async getById(
+    @Param() params: IdInputDto,
+    @GetUser() userContext: UserContext,
+  ): Promise<CommentViewDto> {
+    return this.commentsQueryRepository.getByIdOrThrow(
+      params.id,
+      userContext.id,
+    );
   }
 
   @UseGuards(JwtAuthGuard)
@@ -58,6 +68,24 @@ export class CommentsController {
         userId: userContext.id,
         commentId: params.id,
         content: dto.content,
+      }),
+    );
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @Put(':id/like-status')
+  async setLikeStatus(
+    @Param() params: IdInputDto,
+    @GetUser() userContext: UserContext,
+    @Body() dto: CreateUpdateReactionInput,
+  ) {
+    await this.commandBus.execute(
+      new UpdateReactionCommand({
+        userId: userContext.id,
+        commentOrPostId: params.id,
+        reactionStatus: dto.likeStatus,
+        reactionRelationType: ReactionRelationType.Comment,
       }),
     );
   }

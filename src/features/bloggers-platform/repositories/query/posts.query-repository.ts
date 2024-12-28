@@ -65,7 +65,7 @@ export class PostsQueryRepository {
       if (user && user.userReactions?.length > 0) {
         userPostReactionStatus = user.userReactions.find(
           (userReact) => userReact.commentOrPostId === postId,
-        ).status as any;
+        )?.status as any;
       } else {
         return userPostReactionStatus;
       }
@@ -105,7 +105,7 @@ export class PostsQueryRepository {
           (userReact) => userReact.commentOrPostId === post.id,
         );
 
-        userPostReactionStatus = userPostReaction.status;
+        userPostReactionStatus = userPostReaction?.status;
       }
     }
 

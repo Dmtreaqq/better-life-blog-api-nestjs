@@ -52,8 +52,13 @@ export class PostsController {
   async getCommentsForPost(
     @Param() params: IdInputDto,
     @Query() query: CommentsQueryGetParams,
+    @GetUser() userContext: UserContext,
   ) {
-    return this.commentsQueryRepository.getAll(query, params.id);
+    return this.commentsQueryRepository.getAll(
+      query,
+      params.id,
+      userContext.id,
+    );
   }
 
   @UseGuards(JwtOptionalAuthGuard)
