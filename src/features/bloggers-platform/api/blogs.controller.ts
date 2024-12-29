@@ -22,10 +22,12 @@ import { BlogViewDto } from './view-dto/blog.view-dto';
 import { PostsQueryRepository } from '../repositories/query/posts.query-repository';
 import { PostQueryGetParams } from './input-dto/get-posts-query.dto';
 import { PostsService } from '../application/posts.service';
-import { CreatePostForBlogInputDto, CreatePostInputDto } from './input-dto/create-post-input.dto';
+import { CreatePostForBlogInputDto } from './input-dto/create-post-input.dto';
 import { IdInputDto } from '../../../common/dto/id.input-dto';
 import { BasicAuthGuard } from '../../../common/guards/basic-auth.guard';
 import { JwtOptionalAuthGuard } from '../../../common/guards/jwt-optional-auth.guard';
+import { GetUser } from '../../../common/decorators/get-user.decorator';
+import { UserContext } from '../../../common/dto/user-context.dto';
 
 @Controller('blogs')
 export class BlogsController {
@@ -52,8 +54,9 @@ export class BlogsController {
   async getPostsForBlog(
     @Query() query: PostQueryGetParams,
     @Param() params: IdInputDto,
+    @GetUser() userContext: UserContext,
   ) {
-    return this.postsQueryRepository.getAll(query, params.id);
+    return this.postsQueryRepository.getAll(query, params.id, userContext.id);
   }
 
   @UseGuards(BasicAuthGuard)
