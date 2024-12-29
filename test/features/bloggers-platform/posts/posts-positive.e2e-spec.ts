@@ -8,18 +8,26 @@ import { appSetup } from '../../../../src/settings/app.setup';
 import * as request from 'supertest';
 import { API_PREFIX } from '../../../../src/settings/global-prefix.setup';
 import { API_PATH } from '../../../../src/common/constants';
-import { createPostInput } from '../../../helpers/inputs';
+import {
+  createBlogInput,
+  createPostInput,
+  createUserInput,
+} from '../../../helpers/inputs';
 import { UpdatePostInputDto } from '../../../../src/features/bloggers-platform/api/input-dto/update-post-input.dto';
 import { ReactionStatus } from '../../../../src/features/bloggers-platform/api/enums/ReactionStatus';
 import { TestingModule as TestModule } from '../../../../src/features/testing/testing.module';
 import { CommonConfig } from '../../../../src/common/common.config';
-import { basicAuthHeader } from '../../../helpers/users-test-manager';
+import {
+  basicAuthHeader,
+  UsersTestManager,
+} from '../../../helpers/users-test-manager';
 
 describe('Posts Positive (e2e)', () => {
   let app: INestApplication;
   let mongoServer: MongoMemoryServer;
   let blogsTestManager: BlogsTestManager;
   let postsTestManager: PostsTestManager;
+  let usersTestManager: UsersTestManager;
 
   beforeAll(async () => {
     mongoServer = await MongoMemoryServer.create();
@@ -34,6 +42,7 @@ describe('Posts Positive (e2e)', () => {
     appSetup(app, commonConfig);
     blogsTestManager = new BlogsTestManager(app);
     postsTestManager = new PostsTestManager(app);
+    usersTestManager = new UsersTestManager(app);
 
     await app.init();
   });
@@ -230,346 +239,359 @@ describe('Posts Positive (e2e)', () => {
     expect(response2.body.items).toHaveLength(0);
   });
 
-  // it('should PUT LIKE and DISLIKE post successfully', async () => {
-  //   const blog = await blogsTestManager.createBlog();
-  //   const post = await postsTestManager.createPost(blog.id);
-  //   const user = await usersTestManager.createUser();
-  //   const { accessToken: token, refreshToken } =
-  //     await authTestManager.loginByEmail(user.email, 'password');
-  //
-  //   await request(app.getHttpServer()
-  //     .put(API_PREFIX + API_PATH.POSTS + `/${post.id}/like-status`)
-  //     .set('authorization', `Bearer ${token}`)
-  //     .send({
-  //       likeStatus: 'Like',
-  //     })
-  //     .expect(HttpStatus.NO_CONTENT);
-  //
-  //   const getResponse1 = await request(app.getHttpServer()
-  //     .get(API_PREFIX + API_PATH.POSTS + `/${post.id}`)
-  //     .set('authorization', `Bearer ${token}`)
-  //     .expect(HttpStatus.OK);
-  //
-  //   expect(getResponse1.body).toEqual({
-  //     ...post,
-  //     id: expect.any(String),
-  //     createdAt: expect.any(String),
-  //     extendedLikesInfo: {
-  //       likesCount: 1,
-  //       dislikesCount: 0,
-  //       myStatus: 'Like',
-  //       newestLikes: [
-  //         {
-  //           addedAt: expect.any(String),
-  //           login: user.login,
-  //           userId: user.id,
-  //         },
-  //       ],
-  //     },
-  //   });
-  // });
+  it('should PUT LIKE and DISLIKE post successfully', async () => {
+    const blog = await blogsTestManager.createBlog(createBlogInput);
+    const post = await postsTestManager.createPost({
+      ...createPostInput,
+      blogId: blog.id,
+    });
+    const user = await usersTestManager.createUser(createUserInput);
+    const { accessToken: token } = await usersTestManager.login(
+      user.login,
+      createUserInput.password,
+    );
 
-  //   it('should PUT LIKES', async () => {
-  //     await request(app.getHttpServer().delete(`${API_PREFIX}${API_PATH.TESTING}/all-data`);
-  //     const blog = await blogsTestManager.createBlog();
-  //
-  //     const post1 = await postsTestManager.createPost(blog.id);
-  //     const post2 = await postsTestManager.createPost(blog.id, {
-  //       ...postApiRequestModel,
-  //       title: 'Post 2',
-  //     });
-  //     const post3 = await postsTestManager.createPost(blog.id, {
-  //       ...postApiRequestModel,
-  //       title: 'Post 3',
-  //     });
-  //     const post4 = await postsTestManager.createPost(blog.id, {
-  //       ...postApiRequestModel,
-  //       title: 'Post 4',
-  //     });
-  //     const post5 = await postsTestManager.createPost(blog.id, {
-  //       ...postApiRequestModel,
-  //       title: 'Post 5',
-  //     });
-  //     const post6 = await postsTestManager.createPost(blog.id, {
-  //       ...postApiRequestModel,
-  //       title: 'Post 6',
-  //     });
-  //
-  //     const user1 = await usersTestManager.createUser();
-  //     const user2 = await usersTestManager.createUser({
-  //       email: 'user2@gmail.com',
-  //       login: 'userlogin2',
-  //       password: 'password',
-  //     });
-  //     const user3 = await usersTestManager.createUser({
-  //       email: 'user3@gmail.com',
-  //       login: 'userlogin3',
-  //       password: 'password',
-  //     });
-  //     const user4 = await usersTestManager.createUser({
-  //       email: 'user4@gmail.com',
-  //       login: 'userlogin4',
-  //       password: 'password',
-  //     });
-  //     const { accessToken: token1 } = await authTestManager.loginByEmail(
-  //       user1.email,
-  //       'password',
-  //     );
-  //     const { accessToken: token2 } = await authTestManager.loginByEmail(
-  //       user2.email,
-  //       'password',
-  //     );
-  //     const { accessToken: token3 } = await authTestManager.loginByEmail(
-  //       user3.email,
-  //       'password',
-  //     );
-  //     const { accessToken: token4 } = await authTestManager.loginByEmail(
-  //       user4.email,
-  //       'password',
-  //     );
-  //
-  //     // like post 1 by user 1, user 2;
-  //     await request(app.getHttpServer()
-  //       .put(API_PREFIX + API_PATH.POSTS + `/${post1.id}/like-status`)
-  //       .set('authorization', `Bearer ${token1}`)
-  //       .send({
-  //         likeStatus: 'Like',
-  //       })
-  //       .expect(HttpStatus.NO_CONTENT);
-  //
-  //     await request(app.getHttpServer()
-  //       .put(API_PREFIX + API_PATH.POSTS + `/${post1.id}/like-status`)
-  //       .set('authorization', `Bearer ${token2}`)
-  //       .send({
-  //         likeStatus: 'Like',
-  //       })
-  //       .expect(HttpStatus.NO_CONTENT);
-  //
-  //     // like post 2 by user 2, user 3;
-  //     await request(app.getHttpServer()
-  //       .put(API_PREFIX + API_PATH.POSTS + `/${post2.id}/like-status`)
-  //       .set('authorization', `Bearer ${token2}`)
-  //       .send({
-  //         likeStatus: 'Like',
-  //       })
-  //       .expect(HttpStatus.NO_CONTENT);
-  //
-  //     await request(app.getHttpServer()
-  //       .put(API_PREFIX + API_PATH.POSTS + `/${post2.id}/like-status`)
-  //       .set('authorization', `Bearer ${token3}`)
-  //       .send({
-  //         likeStatus: 'Like',
-  //       })
-  //       .expect(HttpStatus.NO_CONTENT);
-  //
-  //     // dislike post3 by user1
-  //     await request(app.getHttpServer()
-  //       .put(API_PREFIX + API_PATH.POSTS + `/${post3.id}/like-status`)
-  //       .set('authorization', `Bearer ${token1}`)
-  //       .send({
-  //         likeStatus: 'Dislike',
-  //       })
-  //       .expect(HttpStatus.NO_CONTENT);
-  //
-  //     // likes post4 by user1, user4, user2, user3
-  //
-  //     await request(app.getHttpServer()
-  //       .put(API_PREFIX + API_PATH.POSTS + `/${post4.id}/like-status`)
-  //       .set('authorization', `Bearer ${token1}`)
-  //       .send({
-  //         likeStatus: 'Like',
-  //       })
-  //       .expect(HttpStatus.NO_CONTENT);
-  //
-  //     await request(app.getHttpServer()
-  //       .put(API_PREFIX + API_PATH.POSTS + `/${post4.id}/like-status`)
-  //       .set('authorization', `Bearer ${token4}`)
-  //       .send({
-  //         likeStatus: 'Like',
-  //       })
-  //       .expect(HttpStatus.NO_CONTENT);
-  //
-  //     await request(app.getHttpServer()
-  //       .put(API_PREFIX + API_PATH.POSTS + `/${post4.id}/like-status`)
-  //       .set('authorization', `Bearer ${token2}`)
-  //       .send({
-  //         likeStatus: 'Like',
-  //       })
-  //       .expect(HttpStatus.NO_CONTENT);
-  //
-  //     await request(app.getHttpServer()
-  //       .put(API_PREFIX + API_PATH.POSTS + `/${post4.id}/like-status`)
-  //       .set('authorization', `Bearer ${token3}`)
-  //       .send({
-  //         likeStatus: 'Like',
-  //       })
-  //       .expect(HttpStatus.NO_CONTENT);
-  //
-  //     // like post 5 by user 2, dislike by user 3;
-  //
-  //     await request(app.getHttpServer()
-  //       .put(API_PREFIX + API_PATH.POSTS + `/${post5.id}/like-status`)
-  //       .set('authorization', `Bearer ${token2}`)
-  //       .send({
-  //         likeStatus: 'Like',
-  //       })
-  //       .expect(HttpStatus.NO_CONTENT);
-  //
-  //     await request(app.getHttpServer()
-  //       .put(API_PREFIX + API_PATH.POSTS + `/${post5.id}/like-status`)
-  //       .set('authorization', `Bearer ${token3}`)
-  //       .send({
-  //         likeStatus: 'Dislike',
-  //       })
-  //       .expect(HttpStatus.NO_CONTENT);
-  //
-  //     // like post 6 by user 1, dislike by user 2.
-  //
-  //     await request(app.getHttpServer()
-  //       .put(API_PREFIX + API_PATH.POSTS + `/${post6.id}/like-status`)
-  //       .set('authorization', `Bearer ${token1}`)
-  //       .send({
-  //         likeStatus: 'Like',
-  //       })
-  //       .expect(HttpStatus.NO_CONTENT);
-  //
-  //     await request(app.getHttpServer()
-  //       .put(API_PREFIX + API_PATH.POSTS + `/${post6.id}/like-status`)
-  //       .set('authorization', `Bearer ${token2}`)
-  //       .send({
-  //         likeStatus: 'Dislike',
-  //       })
-  //       .expect(HttpStatus.NO_CONTENT);
-  //
-  //     // Get the all posts by user1
-  //     const getResponse1 = await request(app.getHttpServer()
-  //       .get(API_PREFIX + API_PATH.POSTS)
-  //       .set('authorization', `Bearer ${token1}`)
-  //       .expect(HttpStatus.OK);
-  //
-  //     expect(getResponse1.body).toEqual({
-  //       items: [
-  //         {
-  //           ...post6,
-  //           id: expect.any(String),
-  //           createdAt: expect.any(String),
-  //           extendedLikesInfo: {
-  //             likesCount: 1,
-  //             dislikesCount: 1,
-  //             myStatus: 'Like',
-  //             newestLikes: [
-  //               {
-  //                 addedAt: expect.any(String),
-  //                 login: user1.login,
-  //                 userId: user1.id,
-  //               },
-  //             ],
-  //           },
-  //         },
-  //         {
-  //           ...post5,
-  //           id: expect.any(String),
-  //           createdAt: expect.any(String),
-  //           extendedLikesInfo: {
-  //             likesCount: 1,
-  //             dislikesCount: 1,
-  //             myStatus: 'None',
-  //             newestLikes: [
-  //               {
-  //                 addedAt: expect.any(String),
-  //                 login: user2.login,
-  //                 userId: user2.id,
-  //               },
-  //             ],
-  //           },
-  //         },
-  //         {
-  //           ...post4,
-  //           id: expect.any(String),
-  //           createdAt: expect.any(String),
-  //           extendedLikesInfo: {
-  //             likesCount: 4,
-  //             dislikesCount: 0,
-  //             myStatus: 'Like',
-  //             newestLikes: [
-  //               {
-  //                 addedAt: expect.any(String),
-  //                 login: user3.login,
-  //                 userId: user3.id,
-  //               },
-  //               {
-  //                 addedAt: expect.any(String),
-  //                 login: user2.login,
-  //                 userId: user2.id,
-  //               },
-  //               {
-  //                 addedAt: expect.any(String),
-  //                 login: user4.login,
-  //                 userId: user4.id,
-  //               },
-  //             ],
-  //           },
-  //         },
-  //         {
-  //           ...post3,
-  //           id: expect.any(String),
-  //           createdAt: expect.any(String),
-  //           extendedLikesInfo: {
-  //             likesCount: 0,
-  //             dislikesCount: 1,
-  //             myStatus: 'Dislike',
-  //             newestLikes: [],
-  //           },
-  //         },
-  //         {
-  //           ...post2,
-  //           id: expect.any(String),
-  //           createdAt: expect.any(String),
-  //           extendedLikesInfo: {
-  //             likesCount: 2,
-  //             dislikesCount: 0,
-  //             myStatus: 'None',
-  //             newestLikes: [
-  //               {
-  //                 addedAt: expect.any(String),
-  //                 login: user3.login,
-  //                 userId: user3.id,
-  //               },
-  //               {
-  //                 addedAt: expect.any(String),
-  //                 login: user2.login,
-  //                 userId: user2.id,
-  //               },
-  //             ],
-  //           },
-  //         },
-  //         {
-  //           ...post1,
-  //           id: expect.any(String),
-  //           createdAt: expect.any(String),
-  //           extendedLikesInfo: {
-  //             likesCount: 2,
-  //             dislikesCount: 0,
-  //             myStatus: 'Like',
-  //             newestLikes: [
-  //               {
-  //                 addedAt: expect.any(String),
-  //                 login: user2.login,
-  //                 userId: user2.id,
-  //               },
-  //               {
-  //                 addedAt: expect.any(String),
-  //                 login: user1.login,
-  //                 userId: user1.id,
-  //               },
-  //             ],
-  //           },
-  //         },
-  //       ],
-  //       page: expect.any(Number),
-  //       pageSize: expect.any(Number),
-  //       pagesCount: expect.any(Number),
-  //       totalCount: expect.any(Number),
-  //     });
-  //   });
+    await request(app.getHttpServer())
+      .put(API_PREFIX + API_PATH.POSTS + `/${post.id}/like-status`)
+      .set('authorization', `Bearer ${token}`)
+      .send({
+        likeStatus: 'Like',
+      })
+      .expect(HttpStatus.NO_CONTENT);
+
+    const getResponse1 = await request(app.getHttpServer())
+      .get(API_PREFIX + API_PATH.POSTS + `/${post.id}`)
+      .set('authorization', `Bearer ${token}`)
+      .expect(HttpStatus.OK);
+
+    expect(getResponse1.body).toEqual({
+      ...post,
+      id: expect.any(String),
+      createdAt: expect.any(String),
+      extendedLikesInfo: {
+        likesCount: 1,
+        dislikesCount: 0,
+        myStatus: 'Like',
+        newestLikes: [
+          {
+            addedAt: expect.any(String),
+            login: createUserInput.login,
+            userId: user.id,
+          },
+        ],
+      },
+    });
+  });
+
+  it('should PUT LIKES', async () => {
+    // await request(app.getHttpServer().delete(`${API_PREFIX}${API_PATH.TESTING}/all-data`);
+    const blog = await blogsTestManager.createBlog(createBlogInput);
+
+    const post1 = await postsTestManager.createPost({
+      ...createPostInput,
+      blogId: blog.id,
+    });
+    const post2 = await postsTestManager.createPost({
+      ...createPostInput,
+      blogId: blog.id,
+      title: 'Post 2',
+    });
+    const post3 = await postsTestManager.createPost({
+      ...createPostInput,
+      blogId: blog.id,
+      title: 'Post 3',
+    });
+    const post4 = await postsTestManager.createPost({
+      ...createPostInput,
+      blogId: blog.id,
+      title: 'Post 4',
+    });
+    const post5 = await postsTestManager.createPost({
+      ...createPostInput,
+      blogId: blog.id,
+      title: 'Post 5',
+    });
+    const post6 = await postsTestManager.createPost({
+      ...createPostInput,
+      blogId: blog.id,
+      title: 'Post 6',
+    });
+
+    const user1 = await usersTestManager.createUser(createUserInput);
+    const user2 = await usersTestManager.createUser({
+      email: 'user2@gmail.com',
+      login: 'userlogin2',
+      password: 'password',
+    });
+    const user3 = await usersTestManager.createUser({
+      email: 'user3@gmail.com',
+      login: 'userlogin3',
+      password: 'password',
+    });
+    const user4 = await usersTestManager.createUser({
+      email: 'user4@gmail.com',
+      login: 'userlogin4',
+      password: 'password',
+    });
+    const { accessToken: token1 } = await usersTestManager.login(
+      user1.login,
+      createUserInput.password,
+    );
+    const { accessToken: token2 } = await usersTestManager.login(
+      user2.login,
+      'password',
+    );
+    const { accessToken: token3 } = await usersTestManager.login(
+      user3.login,
+      'password',
+    );
+    const { accessToken: token4 } = await usersTestManager.login(
+      user4.login,
+      'password',
+    );
+
+    // like post 1 by user 1, user 2;
+    await request(app.getHttpServer())
+      .put(API_PREFIX + API_PATH.POSTS + `/${post1.id}/like-status`)
+      .set('authorization', `Bearer ${token1}`)
+      .send({
+        likeStatus: 'Like',
+      })
+      .expect(HttpStatus.NO_CONTENT);
+
+    await request(app.getHttpServer())
+      .put(API_PREFIX + API_PATH.POSTS + `/${post1.id}/like-status`)
+      .set('authorization', `Bearer ${token2}`)
+      .send({
+        likeStatus: 'Like',
+      })
+      .expect(HttpStatus.NO_CONTENT);
+
+    // like post 2 by user 2, user 3;
+    await request(app.getHttpServer())
+      .put(API_PREFIX + API_PATH.POSTS + `/${post2.id}/like-status`)
+      .set('authorization', `Bearer ${token2}`)
+      .send({
+        likeStatus: 'Like',
+      })
+      .expect(HttpStatus.NO_CONTENT);
+
+    await request(app.getHttpServer())
+      .put(API_PREFIX + API_PATH.POSTS + `/${post2.id}/like-status`)
+      .set('authorization', `Bearer ${token3}`)
+      .send({
+        likeStatus: 'Like',
+      })
+      .expect(HttpStatus.NO_CONTENT);
+
+    // dislike post3 by user1
+    await request(app.getHttpServer())
+      .put(API_PREFIX + API_PATH.POSTS + `/${post3.id}/like-status`)
+      .set('authorization', `Bearer ${token1}`)
+      .send({
+        likeStatus: 'Dislike',
+      })
+      .expect(HttpStatus.NO_CONTENT);
+
+    // likes post4 by user1, user4, user2, user3
+
+    await request(app.getHttpServer())
+      .put(API_PREFIX + API_PATH.POSTS + `/${post4.id}/like-status`)
+      .set('authorization', `Bearer ${token1}`)
+      .send({
+        likeStatus: 'Like',
+      })
+      .expect(HttpStatus.NO_CONTENT);
+
+    await request(app.getHttpServer())
+      .put(API_PREFIX + API_PATH.POSTS + `/${post4.id}/like-status`)
+      .set('authorization', `Bearer ${token4}`)
+      .send({
+        likeStatus: 'Like',
+      })
+      .expect(HttpStatus.NO_CONTENT);
+
+    await request(app.getHttpServer())
+      .put(API_PREFIX + API_PATH.POSTS + `/${post4.id}/like-status`)
+      .set('authorization', `Bearer ${token2}`)
+      .send({
+        likeStatus: 'Like',
+      })
+      .expect(HttpStatus.NO_CONTENT);
+
+    await request(app.getHttpServer())
+      .put(API_PREFIX + API_PATH.POSTS + `/${post4.id}/like-status`)
+      .set('authorization', `Bearer ${token3}`)
+      .send({
+        likeStatus: 'Like',
+      })
+      .expect(HttpStatus.NO_CONTENT);
+
+    // like post 5 by user 2, dislike by user 3;
+
+    await request(app.getHttpServer())
+      .put(API_PREFIX + API_PATH.POSTS + `/${post5.id}/like-status`)
+      .set('authorization', `Bearer ${token2}`)
+      .send({
+        likeStatus: 'Like',
+      })
+      .expect(HttpStatus.NO_CONTENT);
+
+    await request(app.getHttpServer())
+      .put(API_PREFIX + API_PATH.POSTS + `/${post5.id}/like-status`)
+      .set('authorization', `Bearer ${token3}`)
+      .send({
+        likeStatus: 'Dislike',
+      })
+      .expect(HttpStatus.NO_CONTENT);
+
+    // like post 6 by user 1, dislike by user 2.
+
+    await request(app.getHttpServer())
+      .put(API_PREFIX + API_PATH.POSTS + `/${post6.id}/like-status`)
+      .set('authorization', `Bearer ${token1}`)
+      .send({
+        likeStatus: 'Like',
+      })
+      .expect(HttpStatus.NO_CONTENT);
+
+    await request(app.getHttpServer())
+      .put(API_PREFIX + API_PATH.POSTS + `/${post6.id}/like-status`)
+      .set('authorization', `Bearer ${token2}`)
+      .send({
+        likeStatus: 'Dislike',
+      })
+      .expect(HttpStatus.NO_CONTENT);
+
+    // Get the all posts by user1
+    const getResponse1 = await request(app.getHttpServer())
+      .get(API_PREFIX + API_PATH.POSTS)
+      .set('authorization', `Bearer ${token1}`)
+      .expect(HttpStatus.OK);
+
+    expect(getResponse1.body).toEqual({
+      items: [
+        {
+          ...post6,
+          id: expect.any(String),
+          createdAt: expect.any(String),
+          extendedLikesInfo: {
+            likesCount: 1,
+            dislikesCount: 1,
+            myStatus: 'Like',
+            newestLikes: [
+              {
+                addedAt: expect.any(String),
+                login: user1.login,
+                userId: user1.id,
+              },
+            ],
+          },
+        },
+        {
+          ...post5,
+          id: expect.any(String),
+          createdAt: expect.any(String),
+          extendedLikesInfo: {
+            likesCount: 1,
+            dislikesCount: 1,
+            myStatus: 'None',
+            newestLikes: [
+              {
+                addedAt: expect.any(String),
+                login: user2.login,
+                userId: user2.id,
+              },
+            ],
+          },
+        },
+        {
+          ...post4,
+          id: expect.any(String),
+          createdAt: expect.any(String),
+          extendedLikesInfo: {
+            likesCount: 4,
+            dislikesCount: 0,
+            myStatus: 'Like',
+            newestLikes: [
+              {
+                addedAt: expect.any(String),
+                login: user3.login,
+                userId: user3.id,
+              },
+              {
+                addedAt: expect.any(String),
+                login: user2.login,
+                userId: user2.id,
+              },
+              {
+                addedAt: expect.any(String),
+                login: user4.login,
+                userId: user4.id,
+              },
+            ],
+          },
+        },
+        {
+          ...post3,
+          id: expect.any(String),
+          createdAt: expect.any(String),
+          extendedLikesInfo: {
+            likesCount: 0,
+            dislikesCount: 1,
+            myStatus: 'Dislike',
+            newestLikes: [],
+          },
+        },
+        {
+          ...post2,
+          id: expect.any(String),
+          createdAt: expect.any(String),
+          extendedLikesInfo: {
+            likesCount: 2,
+            dislikesCount: 0,
+            myStatus: 'None',
+            newestLikes: [
+              {
+                addedAt: expect.any(String),
+                login: user3.login,
+                userId: user3.id,
+              },
+              {
+                addedAt: expect.any(String),
+                login: user2.login,
+                userId: user2.id,
+              },
+            ],
+          },
+        },
+        {
+          ...post1,
+          id: expect.any(String),
+          createdAt: expect.any(String),
+          extendedLikesInfo: {
+            likesCount: 2,
+            dislikesCount: 0,
+            myStatus: 'Like',
+            newestLikes: [
+              {
+                addedAt: expect.any(String),
+                login: user2.login,
+                userId: user2.id,
+              },
+              {
+                addedAt: expect.any(String),
+                login: user1.login,
+                userId: user1.id,
+              },
+            ],
+          },
+        },
+      ],
+      page: expect.any(Number),
+      pageSize: expect.any(Number),
+      pagesCount: expect.any(Number),
+      totalCount: expect.any(Number),
+    });
+  });
 });

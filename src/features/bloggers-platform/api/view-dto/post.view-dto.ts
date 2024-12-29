@@ -79,7 +79,7 @@ export class PostViewDto {
       .slice(-3)
       .reverse()
       .map((like) => ({
-        login: like.userId,
+        login: like.login,
         addedAt: like.createdAt,
         userId: like.userId,
       }));

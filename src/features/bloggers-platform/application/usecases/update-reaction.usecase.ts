@@ -2,12 +2,15 @@ import { CreateReactionDto } from '../../dto/create-reaction.dto';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { ReactionRelationType } from '../../api/enums/ReactionRelationType';
 import { UsersRepository } from '../../../user-platform/repositories/users.repository';
-import { BadRequestException, UnauthorizedException } from '@nestjs/common';
+import { UnauthorizedException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Reaction, ReactionModelType } from '../../domain/reaction.entity';
 import { PostsRepository } from '../../repositories/posts.repository';
 import { CommentsRepository } from '../../repositories/comments.repository';
-import { ReactionStatus } from '../../api/enums/ReactionStatus';
+import {
+  ReactionModelStatus,
+  ReactionStatus,
+} from '../../api/enums/ReactionStatus';
 
 export class UpdateReactionCommand {
   constructor(public dto: CreateReactionDto) {}
@@ -44,6 +47,7 @@ export class UpdateReactionUseCase
         return;
       }
       const reaction = this.ReactionModel.createInstance({
+        login: user.login,
         reactionStatus,
         reactionRelationType,
         userId,
@@ -51,7 +55,7 @@ export class UpdateReactionUseCase
       });
 
       if (reactionRelationType === ReactionRelationType.Post) {
-        const post = await this.postsRepository.getById(commentOrPostId);
+        const post = await this.postsRepository.getByIdOrThrow(commentOrPostId);
         user.userReactions.push({
           status: reaction.reactionStatus,
           commentOrPostId: post.id,
@@ -64,7 +68,8 @@ export class UpdateReactionUseCase
       }
 
       if (reactionRelationType === ReactionRelationType.Comment) {
-        const comment = await this.commentsRepository.getById(commentOrPostId);
+        const comment =
+          await this.commentsRepository.getByIdOrThrow(commentOrPostId);
         user.userReactions.push({
           status: reaction.reactionStatus,
           commentOrPostId: comment.id,
@@ -99,15 +104,14 @@ export class UpdateReactionUseCase
           await this.usersRepository.save(user);
 
           const post = await this.postsRepository.getById(commentOrPostId);
-          console.log(post);
+
           const postReactionIdToDelete = post.reactions.find(
             (react) => react.userId === user.id,
           ).id;
-          console.log(postReactionIdToDelete);
+
           const indexS = post.reactions.findIndex(
             (item) => item.id === postReactionIdToDelete,
           );
-          console.log(indexS);
 
           if (indexS !== -1) {
             post.reactions.splice(indexS, 1);
@@ -144,6 +148,123 @@ export class UpdateReactionUseCase
           await this.commentsRepository.save(comment);
 
           return;
+        }
+      }
+
+      // IF IT IS NOT A REMOVE (NONE) AND NOT SAME REACTION
+      // IF IT IS A LIKE REACTION
+      if (reactionStatus === ReactionStatus.Like) {
+        // IF IT IS A POST
+        if (reactionRelationType === ReactionRelationType.Post) {
+          user.userReactions = user.userReactions.map((userReact) => {
+            if (userReact.id === userReactionAtThisEntity.id) {
+              userReact.status = ReactionModelStatus.Like;
+              return userReact;
+            }
+
+            return userReact;
+          }) as any;
+          // TODO: ASK WHY ANY
+          await this.usersRepository.save(user);
+
+          const post = await this.postsRepository.getById(commentOrPostId);
+
+          post.reactions = post.reactions.map((postReact) => {
+            if (postReact.userId === user.id) {
+              postReact.reactionStatus = ReactionModelStatus.Like;
+              return postReact;
+            }
+
+            return postReact;
+          }) as any;
+
+          await this.postsRepository.save(post);
+        }
+
+        // IF IT IS A COMMENT
+        if (reactionRelationType === ReactionRelationType.Comment) {
+          user.userReactions = user.userReactions.map((userReact) => {
+            if (userReact.id === userReactionAtThisEntity.id) {
+              userReact.status = ReactionModelStatus.Like;
+              return userReact;
+            }
+
+            return userReact;
+          }) as any;
+          // TODO: ASK WHY ANY
+          await this.usersRepository.save(user);
+
+          const comment =
+            await this.commentsRepository.getById(commentOrPostId);
+
+          comment.reactions = comment.reactions.map((commentReact) => {
+            if (commentReact.userId === user.id) {
+              commentReact.reactionStatus = ReactionModelStatus.Like;
+              return commentReact;
+            }
+
+            return commentReact;
+          }) as any;
+
+          await this.commentsRepository.save(comment);
+        }
+      }
+
+      // IF IT IS A DISLIKE REACTION
+      if (reactionStatus === ReactionStatus.Dislike) {
+        // IF IT IS A POST
+        if (reactionRelationType === ReactionRelationType.Post) {
+          user.userReactions = user.userReactions.map((userReact) => {
+            if (userReact.id === userReactionAtThisEntity.id) {
+              userReact.status = ReactionModelStatus.Dislike;
+              return userReact;
+            }
+
+            return userReact;
+          }) as any;
+          // TODO: ASK WHY ANY
+          await this.usersRepository.save(user);
+
+          const post = await this.postsRepository.getById(commentOrPostId);
+
+          post.reactions = post.reactions.map((postReact) => {
+            if (postReact.userId === user.id) {
+              postReact.reactionStatus = ReactionModelStatus.Dislike;
+              return postReact;
+            }
+
+            return postReact;
+          }) as any;
+
+          await this.postsRepository.save(post);
+        }
+
+        // IF IT IS A COMMENT
+        if (reactionRelationType === ReactionRelationType.Comment) {
+          user.userReactions = user.userReactions.map((userReact) => {
+            if (userReact.id === userReactionAtThisEntity.id) {
+              userReact.status = ReactionModelStatus.Dislike;
+              return userReact;
+            }
+
+            return userReact;
+          }) as any;
+          // TODO: ASK WHY ANY
+          await this.usersRepository.save(user);
+
+          const comment =
+            await this.commentsRepository.getById(commentOrPostId);
+
+          comment.reactions = comment.reactions.map((commentReact) => {
+            if (commentReact.userId === user.id) {
+              commentReact.reactionStatus = ReactionModelStatus.Dislike;
+              return commentReact;
+            }
+
+            return commentReact;
+          }) as any;
+
+          await this.commentsRepository.save(comment);
         }
       }
     }

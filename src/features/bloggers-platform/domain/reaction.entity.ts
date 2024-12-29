@@ -10,6 +10,9 @@ export class Reaction {
   userId: string;
 
   @Prop({ type: String, required: true })
+  login: string;
+
+  @Prop({ type: String, required: true })
   commentOrPostId: string;
 
   @Prop({ type: String, enum: ReactionModelStatus, required: true })
@@ -28,6 +31,7 @@ export class Reaction {
     like.commentOrPostId = dto.commentOrPostId;
     like.reactionStatus = dto.reactionStatus as any;
     like.reactionRelationType = dto.reactionRelationType;
+    like.login = dto.login;
 
     return like as ReactionDocument;
   }

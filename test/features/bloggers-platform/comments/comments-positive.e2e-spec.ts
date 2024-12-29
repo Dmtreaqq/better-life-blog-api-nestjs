@@ -238,245 +238,293 @@ describe('Comments Positive (e2e)', () => {
     });
   });
 
-  // it('should PUT LIKE and DISLIKE comment successfully', async () => {
-  //   const blog = await blogsTestManager.createBlog();
-  //   const post = await postsTestManager.createPost(blog.id);
-  //   const user = await usersTestManager.createUser();
-  //   const { accessToken: token, refreshToken } =
-  //     await authTestManager.loginByEmail(user.email, 'password');
-  //   const comment = await commentsTestManager.createComment(post.id, token);
-  //
-  //   await request(app.getHttpServer())
-  //     .put(API_PREFIX + API_PATH.COMMENTS + `/${comment.id}/like-status`)
-  //     .set('authorization', `Bearer ${token}`)
-  //     .send({
-  //       likeStatus: 'Like',
-  //     })
-  //     .expect(HttpStatus.NO_CONTENT);
-  //
-  //   const getResponse1 = await request(app.getHttpServer())
-  //     .get(API_PREFIX + API_PATH.COMMENTS + `/${comment.id}`)
-  //     .set('authorization', `Bearer ${token}`)
-  //     .expect(HttpStatus.OK);
-  //
-  //   expect(getResponse1.body).toEqual({
-  //     ...comment,
-  //     id: expect.any(String),
-  //     createdAt: expect.any(String),
-  //     likesInfo: {
-  //       likesCount: 1,
-  //       dislikesCount: 0,
-  //       myStatus: 'Like',
-  //     },
-  //   });
-  //
-  //   await request(app.getHttpServer())
-  //     .put(API_PREFIX + API_PATH.COMMENTS + `/${comment.id}/like-status`)
-  //     .set('authorization', `Bearer ${token}`)
-  //     .send({
-  //       likeStatus: 'Dislike',
-  //     })
-  //     .expect(HttpStatus.NO_CONTENT);
-  //
-  //   const getResponse2 = await request(app.getHttpServer())
-  //     .get(API_PREFIX + API_PATH.COMMENTS + `/${comment.id}`)
-  //     //   .set('Cookie', [refreshToken])
-  //     .set('authorization', `Bearer ${token}`)
-  //     .expect(HttpStatus.OK);
-  //
-  //   expect(getResponse2.body).toEqual({
-  //     ...comment,
-  //     id: expect.any(String),
-  //     createdAt: expect.any(String),
-  //     likesInfo: {
-  //       likesCount: 0,
-  //       dislikesCount: 1,
-  //       myStatus: 'Dislike',
-  //     },
-  //   });
-  // });
+  it('should PUT LIKE and DISLIKE comment successfully', async () => {
+    const blog = await blogsTestManager.createBlog(createBlogInput);
+    const post = await postsTestManager.createPost({
+      ...createPostInput,
+      blogId: blog.id,
+    });
+    const user = await usersTestManager.createUser(createUserInput);
+    const { accessToken: token } = await usersTestManager.login(
+      user.login,
+      createUserInput.password,
+    );
+    const comment = await commentsTestManager.createComment(
+      { content: 'Some content for comment' },
+      token,
+      post.id,
+    );
 
-  // it('should PUT None comment successfully', async () => {
-  //   const blog = await blogsTestManager.createBlog();
-  //   const post = await postsTestManager.createPost(blog.id);
-  //   const user = await usersTestManager.createUser();
-  //   const { accessToken: token, refreshToken } =
-  //     await authTestManager.loginByEmail(user.email, 'password');
-  //   const comment = await commentsTestManager.createComment(post.id, token);
-  //
-  //   await request(app.getHttpServer())
-  //     .put(API_PREFIX + API_PATH.COMMENTS + `/${comment.id}/like-status`)
-  //     .set('authorization', `Bearer ${token}`)
-  //     .send({
-  //       likeStatus: 'None',
-  //     })
-  //     .expect(HttpStatus.NO_CONTENT, {});
-  //
-  //   const getResponse1 = await request(app.getHttpServer())
-  //     .get(API_PREFIX + API_PATH.COMMENTS + `/${comment.id}`)
-  //     .set('Cookie', [refreshToken])
-  //     .expect(HttpStatus.OK);
-  //
-  //   expect(getResponse1.body).toEqual({
-  //     ...comment,
-  //     id: expect.any(String),
-  //     createdAt: expect.any(String),
-  //     likesInfo: {
-  //       likesCount: 0,
-  //       dislikesCount: 0,
-  //       myStatus: 'None',
-  //     },
-  //   });
-  // });
-  //
-  // it('should PUT None after Dislike comment successfully', async () => {
-  //   const blog = await blogsTestManager.createBlog();
-  //   const post = await postsTestManager.createPost(blog.id);
-  //   const user = await usersTestManager.createUser();
-  //   const { accessToken: token, refreshToken } =
-  //     await authTestManager.loginByEmail(user.email, 'password');
-  //   const comment = await commentsTestManager.createComment(post.id, token);
-  //
-  //   await request(app.getHttpServer())
-  //     .put(API_PREFIX + API_PATH.COMMENTS + `/${comment.id}/like-status`)
-  //     .set('authorization', `Bearer ${token}`)
-  //     .send({
-  //       likeStatus: 'Dislike',
-  //     })
-  //     .expect(HttpStatus.NO_CONTENT);
-  //
-  //   const getResponse1 = await request(app.getHttpServer())
-  //     .get(API_PREFIX + API_PATH.COMMENTS + `/${comment.id}`)
-  //     .set('authorization', `Bearer ${token}`)
-  //     .set('Cookie', [refreshToken])
-  //     .expect(HttpStatus.OK);
-  //
-  //   expect(getResponse1.body).toEqual({
-  //     ...comment,
-  //     id: expect.any(String),
-  //     createdAt: expect.any(String),
-  //     likesInfo: {
-  //       likesCount: 0,
-  //       dislikesCount: 1,
-  //       myStatus: 'Dislike',
-  //     },
-  //   });
-  //
-  //   await request(app.getHttpServer())
-  //     .put(API_PREFIX + API_PATH.COMMENTS + `/${comment.id}/like-status`)
-  //     .set('authorization', `Bearer ${token}`)
-  //     .send({
-  //       likeStatus: 'None',
-  //     })
-  //     .expect(HttpStatus.NO_CONTENT);
-  //
-  //   const getResponse2 = await request(app.getHttpServer())
-  //     .get(API_PREFIX + API_PATH.COMMENTS + `/${comment.id}`)
-  //     .set('Cookie', [refreshToken])
-  //     .set('authorization', `Bearer ${token}`)
-  //     .expect(HttpStatus.OK);
-  //
-  //   expect(getResponse2.body).toEqual({
-  //     ...comment,
-  //     id: expect.any(String),
-  //     createdAt: expect.any(String),
-  //     likesInfo: {
-  //       likesCount: 0,
-  //       dislikesCount: 0,
-  //       myStatus: 'None',
-  //     },
-  //   });
-  // });
-  //
-  // it('should PUT Like comment first user, but receive second user successfully', async () => {
-  //   const blog = await blogsTestManager.createBlog();
-  //   const post = await postsTestManager.createPost(blog.id);
-  //   const user = await usersTestManager.createUser();
-  //   const { accessToken: token, refreshToken } =
-  //     await authTestManager.loginByEmail(user.email, 'password');
-  //   const userSecond = await usersTestManager.createUser({
-  //     email: 'newuser@mail.com',
-  //     login: 'newuser',
-  //     password: '123456',
-  //   });
-  //   const { refreshToken2 } = await authTestManager.loginByEmail(
-  //     userSecond.email,
-  //     '123456',
-  //   );
-  //   const comment = await commentsTestManager.createComment(post.id, token);
-  //
-  //   await request(app.getHttpServer())
-  //     .put(API_PREFIX + API_PATH.COMMENTS + `/${comment.id}/like-status`)
-  //     .set('authorization', `Bearer ${token}`)
-  //     .send({
-  //       likeStatus: 'Like',
-  //     })
-  //     .expect(HttpStatus.NO_CONTENT, {});
-  //
-  //   const getResponse1 = await request(app.getHttpServer())
-  //     .get(API_PREFIX + API_PATH.COMMENTS + `/${comment.id}`)
-  //     .set('Cookie', [refreshToken2])
-  //     .expect(HttpStatus.OK);
-  //
-  //   expect(getResponse1.body).toEqual({
-  //     ...comment,
-  //     id: expect.any(String),
-  //     createdAt: expect.any(String),
-  //     likesInfo: {
-  //       likesCount: 1,
-  //       dislikesCount: 0,
-  //       myStatus: 'None',
-  //     },
-  //   });
-  // });
-  //
-  // it('should PUT Like comment first user, but second user Dislike successfully', async () => {
-  //   const blog = await blogsTestManager.createBlog();
-  //   const post = await postsTestManager.createPost(blog.id);
-  //   const user = await usersTestManager.createUser();
-  //   const { accessToken: token, refreshToken } =
-  //     await authTestManager.loginByEmail(user.email, 'password');
-  //   const userSecond = await usersTestManager.createUser({
-  //     email: 'newuser@mail.com',
-  //     login: 'newuser',
-  //     password: '123456',
-  //   });
-  //   const { accessToken: accessTokenSecond, refreshToken: refreshTokenSecond } =
-  //     await authTestManager.loginByEmail(userSecond.email, '123456');
-  //   const comment = await commentsTestManager.createComment(post.id, token);
-  //
-  //   await request(app.getHttpServer())
-  //     .put(API_PREFIX + API_PATH.COMMENTS + `/${comment.id}/like-status`)
-  //     .set('authorization', `Bearer ${token}`)
-  //     .set('Cookie', [refreshToken])
-  //     .send({
-  //       likeStatus: 'Like',
-  //     })
-  //     .expect(HttpStatus.NO_CONTENT);
-  //
-  //   await request(app.getHttpServer())
-  //     .put(API_PREFIX + API_PATH.COMMENTS + `/${comment.id}/like-status`)
-  //     .set('authorization', `Bearer ${accessTokenSecond}`)
-  //     .send({
-  //       likeStatus: 'Dislike',
-  //     })
-  //     .expect(HttpStatus.NO_CONTENT);
-  //
-  //   const getResponse1 = await request(app.getHttpServer())
-  //     .get(API_PREFIX + API_PATH.COMMENTS + `/${comment.id}`)
-  //     .set('Cookie', [refreshTokenSecond])
-  //     .set('authorization', `Bearer ${accessTokenSecond}`)
-  //     .expect(HttpStatus.OK);
-  //
-  //   expect(getResponse1.body).toEqual({
-  //     ...comment,
-  //     id: expect.any(String),
-  //     createdAt: expect.any(String),
-  //     likesInfo: {
-  //       likesCount: 1,
-  //       dislikesCount: 1,
-  //       myStatus: 'Dislike',
-  //     },
-  //   });
-  // });
+    await request(app.getHttpServer())
+      .put(API_PREFIX + API_PATH.COMMENTS + `/${comment.id}/like-status`)
+      .set('authorization', `Bearer ${token}`)
+      .send({
+        likeStatus: 'Like',
+      })
+      .expect(HttpStatus.NO_CONTENT);
+
+    const getResponse1 = await request(app.getHttpServer())
+      .get(API_PREFIX + API_PATH.COMMENTS + `/${comment.id}`)
+      .set('authorization', `Bearer ${token}`)
+      .expect(HttpStatus.OK);
+
+    expect(getResponse1.body).toEqual({
+      ...comment,
+      id: expect.any(String),
+      createdAt: expect.any(String),
+      likesInfo: {
+        likesCount: 1,
+        dislikesCount: 0,
+        myStatus: 'Like',
+      },
+    });
+
+    await request(app.getHttpServer())
+      .put(API_PREFIX + API_PATH.COMMENTS + `/${comment.id}/like-status`)
+      .set('authorization', `Bearer ${token}`)
+      .send({
+        likeStatus: 'Dislike',
+      })
+      .expect(HttpStatus.NO_CONTENT);
+
+    const getResponse2 = await request(app.getHttpServer())
+      .get(API_PREFIX + API_PATH.COMMENTS + `/${comment.id}`)
+      //   .set('Cookie', [refreshToken])
+      .set('authorization', `Bearer ${token}`)
+      .expect(HttpStatus.OK);
+
+    expect(getResponse2.body).toEqual({
+      ...comment,
+      id: expect.any(String),
+      createdAt: expect.any(String),
+      likesInfo: {
+        likesCount: 0,
+        dislikesCount: 1,
+        myStatus: 'Dislike',
+      },
+    });
+  });
+
+  it('should PUT None comment successfully', async () => {
+    const blog = await blogsTestManager.createBlog(createBlogInput);
+    const post = await postsTestManager.createPost({
+      ...createPostInput,
+      blogId: blog.id,
+    });
+    const user = await usersTestManager.createUser(createUserInput);
+    const { accessToken: token } = await usersTestManager.login(
+      user.login,
+      createUserInput.password,
+    );
+    const comment = await commentsTestManager.createComment(
+      { content: 'Some content for comment' },
+      token,
+      post.id,
+    );
+
+    await request(app.getHttpServer())
+      .put(API_PREFIX + API_PATH.COMMENTS + `/${comment.id}/like-status`)
+      .set('authorization', `Bearer ${token}`)
+      .send({
+        likeStatus: 'None',
+      })
+      .expect(HttpStatus.NO_CONTENT, {});
+
+    const getResponse1 = await request(app.getHttpServer())
+      .get(API_PREFIX + API_PATH.COMMENTS + `/${comment.id}`)
+      // .set('Cookie', [refreshToken])
+      .expect(HttpStatus.OK);
+
+    expect(getResponse1.body).toEqual({
+      ...comment,
+      id: expect.any(String),
+      createdAt: expect.any(String),
+      likesInfo: {
+        likesCount: 0,
+        dislikesCount: 0,
+        myStatus: 'None',
+      },
+    });
+  });
+
+  it('should PUT None after Dislike comment successfully', async () => {
+    const blog = await blogsTestManager.createBlog(createBlogInput);
+    const post = await postsTestManager.createPost({
+      ...createPostInput,
+      blogId: blog.id,
+    });
+    const user = await usersTestManager.createUser(createUserInput);
+    const { accessToken: token } = await usersTestManager.login(
+      user.login,
+      createUserInput.password,
+    );
+    const comment = await commentsTestManager.createComment(
+      { content: 'Some content for comment' },
+      token,
+      post.id,
+    );
+
+    await request(app.getHttpServer())
+      .put(API_PREFIX + API_PATH.COMMENTS + `/${comment.id}/like-status`)
+      .set('authorization', `Bearer ${token}`)
+      .send({
+        likeStatus: 'Dislike',
+      })
+      .expect(HttpStatus.NO_CONTENT);
+
+    const getResponse1 = await request(app.getHttpServer())
+      .get(API_PREFIX + API_PATH.COMMENTS + `/${comment.id}`)
+      .set('authorization', `Bearer ${token}`)
+      // .set('Cookie', [refreshToken])
+      .expect(HttpStatus.OK);
+
+    expect(getResponse1.body).toEqual({
+      ...comment,
+      id: expect.any(String),
+      createdAt: expect.any(String),
+      likesInfo: {
+        likesCount: 0,
+        dislikesCount: 1,
+        myStatus: 'Dislike',
+      },
+    });
+
+    await request(app.getHttpServer())
+      .put(API_PREFIX + API_PATH.COMMENTS + `/${comment.id}/like-status`)
+      .set('authorization', `Bearer ${token}`)
+      .send({
+        likeStatus: 'None',
+      })
+      .expect(HttpStatus.NO_CONTENT);
+
+    const getResponse2 = await request(app.getHttpServer())
+      .get(API_PREFIX + API_PATH.COMMENTS + `/${comment.id}`)
+      // .set('Cookie', [refreshToken])
+      .set('authorization', `Bearer ${token}`)
+      .expect(HttpStatus.OK);
+
+    expect(getResponse2.body).toEqual({
+      ...comment,
+      id: expect.any(String),
+      createdAt: expect.any(String),
+      likesInfo: {
+        likesCount: 0,
+        dislikesCount: 0,
+        myStatus: 'None',
+      },
+    });
+  });
+
+  it('should PUT Like comment first user, but receive second user successfully', async () => {
+    const blog = await blogsTestManager.createBlog(createBlogInput);
+    const post = await postsTestManager.createPost({
+      ...createPostInput,
+      blogId: blog.id,
+    });
+    const userFirst = await usersTestManager.createUser(createUserInput);
+    const { accessToken: token1 } = await usersTestManager.login(
+      userFirst.login,
+      createUserInput.password,
+    );
+    const comment = await commentsTestManager.createComment(
+      { content: 'Some content for comment' },
+      token1,
+      post.id,
+    );
+    const userSecond = await usersTestManager.createUser({
+      email: 'newuser@mail.com',
+      login: 'newuser',
+      password: '123456',
+    });
+    const { accessToken: token2 } = await usersTestManager.login(
+      userSecond.login,
+      '123456',
+    );
+
+    await request(app.getHttpServer())
+      .put(API_PREFIX + API_PATH.COMMENTS + `/${comment.id}/like-status`)
+      .set('authorization', `Bearer ${token1}`)
+      .send({
+        likeStatus: 'Like',
+      })
+      .expect(HttpStatus.NO_CONTENT, {});
+
+    const getResponse1 = await request(app.getHttpServer())
+      .get(API_PREFIX + API_PATH.COMMENTS + `/${comment.id}`)
+      .set('authorization', `Bearer ${token2}`)
+      // .set('Cookie', [refreshToken2])
+      .expect(HttpStatus.OK);
+
+    expect(getResponse1.body).toEqual({
+      ...comment,
+      id: expect.any(String),
+      createdAt: expect.any(String),
+      likesInfo: {
+        likesCount: 1,
+        dislikesCount: 0,
+        myStatus: 'None',
+      },
+    });
+  });
+
+  it('should PUT Like comment first user, but second user Dislike successfully', async () => {
+    const blog = await blogsTestManager.createBlog(createBlogInput);
+    const post = await postsTestManager.createPost({
+      ...createPostInput,
+      blogId: blog.id,
+    });
+    const user = await usersTestManager.createUser(createUserInput);
+    const { accessToken: token } = await usersTestManager.login(
+      user.login,
+      createUserInput.password,
+    );
+    const userSecond = await usersTestManager.createUser({
+      email: 'newuser@mail.com',
+      login: 'newuser',
+      password: '123456',
+    });
+    const { accessToken: accessTokenSecond } = await usersTestManager.login(
+      userSecond.login,
+      '123456',
+    );
+    const comment = await commentsTestManager.createComment(
+      { content: 'Some new comment created' },
+      token,
+      post.id,
+    );
+
+    await request(app.getHttpServer())
+      .put(API_PREFIX + API_PATH.COMMENTS + `/${comment.id}/like-status`)
+      .set('authorization', `Bearer ${token}`)
+      // .set('Cookie', [refreshToken])
+      .send({
+        likeStatus: 'Like',
+      })
+      .expect(HttpStatus.NO_CONTENT);
+
+    await request(app.getHttpServer())
+      .put(API_PREFIX + API_PATH.COMMENTS + `/${comment.id}/like-status`)
+      .set('authorization', `Bearer ${accessTokenSecond}`)
+      .send({
+        likeStatus: 'Dislike',
+      })
+      .expect(HttpStatus.NO_CONTENT);
+
+    const getResponse1 = await request(app.getHttpServer())
+      .get(API_PREFIX + API_PATH.COMMENTS + `/${comment.id}`)
+      // .set('Cookie', [refreshTokenSecond])
+      .set('authorization', `Bearer ${accessTokenSecond}`)
+      .expect(HttpStatus.OK);
+
+    expect(getResponse1.body).toEqual({
+      ...comment,
+      id: expect.any(String),
+      createdAt: expect.any(String),
+      likesInfo: {
+        likesCount: 1,
+        dislikesCount: 1,
+        myStatus: 'Dislike',
+      },
+    });
+  });
 });
