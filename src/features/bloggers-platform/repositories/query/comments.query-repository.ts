@@ -1,8 +1,4 @@
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { CommentModelType } from '../../domain/comment.entity';
 import { CommentViewDto } from '../../api/view-dto/comment.view-dto';
@@ -19,12 +15,14 @@ import {
   UserDocument,
   UserModelType,
 } from '../../../user-platform/domain/user.entity';
+import { Post, PostModelType } from '../../domain/post.entity';
 
 @Injectable()
 export class CommentsQueryRepository {
   constructor(
     @InjectModel(Comment.name) private CommentModel: CommentModelType,
     @InjectModel(User.name) private UserModel: UserModelType,
+    @InjectModel(Post.name) private PostModel: PostModelType,
   ) {}
 
   async getAll(
@@ -32,6 +30,11 @@ export class CommentsQueryRepository {
     postId: string,
     userId?: string,
   ): Promise<BasePaginationViewDto<CommentViewDto[]>> {
+    const post = await this.PostModel.findById(postId);
+    if (!post) {
+      throw new NotFoundException();
+    }
+
     const filter: FilterQuery<Comment> = {};
     filter.postId = postId;
 
