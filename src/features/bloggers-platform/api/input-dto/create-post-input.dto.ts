@@ -1,5 +1,6 @@
 import { IsMongoId, IsNotEmpty, IsString, MaxLength } from 'class-validator';
 import { Trim } from '../../../../common/decorators/custom-trim.decorator';
+import { BlogIsExist } from '../../validation/blog-is-exist.decorator';
 
 export class CreatePostInputDto {
   @MaxLength(30)
@@ -20,6 +21,7 @@ export class CreatePostInputDto {
   @IsString()
   content: string;
 
+  @BlogIsExist()
   @IsMongoId()
   @IsNotEmpty()
   @Trim()

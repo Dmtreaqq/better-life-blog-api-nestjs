@@ -45,4 +45,12 @@ export class BlogsRepository {
       ]);
     }
   }
+
+  async blogIsExist(id: string): Promise<boolean> {
+    const blog = await this.BlogModel.findById(id);
+
+    if (!blog) return false;
+
+    return true;
+  }
 }

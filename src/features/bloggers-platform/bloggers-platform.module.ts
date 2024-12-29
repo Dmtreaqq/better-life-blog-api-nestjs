@@ -20,6 +20,7 @@ import { DeleteCommentUseCase } from './application/usecases/delete-comment.usec
 import { UpdateCommentUseCase } from './application/usecases/update-comment.usecase';
 import { Reaction, ReactionSchema } from './domain/reaction.entity';
 import { UpdateReactionUseCase } from './application/usecases/update-reaction.usecase';
+import { BlogIsExistConstraint } from './validation/blog-is-exist.decorator';
 
 const useCases = [
   CreateCommentUseCase,
@@ -48,6 +49,7 @@ const useCases = [
     PostsRepository,
     CommentsQueryRepository,
     CommentsRepository,
+    BlogIsExistConstraint,
     ...useCases,
   ],
   exports: [MongooseModule],
