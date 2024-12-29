@@ -2,7 +2,7 @@ import { CreateReactionDto } from '../../dto/create-reaction.dto';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { ReactionRelationType } from '../../api/enums/ReactionRelationType';
 import { UsersRepository } from '../../../user-platform/repositories/users.repository';
-import { UnauthorizedException } from '@nestjs/common';
+import { NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Reaction, ReactionModelType } from '../../domain/reaction.entity';
 import { PostsRepository } from '../../repositories/posts.repository';
@@ -34,6 +34,14 @@ export class UpdateReactionUseCase
     const user = await this.usersRepository.findById(userId);
     if (!user) {
       throw new UnauthorizedException();
+    }
+
+    // CHECK IF COMMENT OR POST EXIST
+    const post = await this.postsRepository.getById(commentOrPostId);
+    const comment = await this.commentsRepository.getById(commentOrPostId);
+
+    if (!post && !comment) {
+      throw new NotFoundException();
     }
 
     // CHECK IF USER ALREADY LEFT A REACTION ON THIS POST or COMMENT
