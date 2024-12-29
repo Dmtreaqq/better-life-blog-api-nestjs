@@ -22,7 +22,7 @@ import { BlogViewDto } from './view-dto/blog.view-dto';
 import { PostsQueryRepository } from '../repositories/query/posts.query-repository';
 import { PostQueryGetParams } from './input-dto/get-posts-query.dto';
 import { PostsService } from '../application/posts.service';
-import { CreatePostInputDto } from './input-dto/create-post-input.dto';
+import { CreatePostForBlogInputDto, CreatePostInputDto } from './input-dto/create-post-input.dto';
 import { IdInputDto } from '../../../common/dto/id.input-dto';
 import { BasicAuthGuard } from '../../../common/guards/basic-auth.guard';
 import { JwtOptionalAuthGuard } from '../../../common/guards/jwt-optional-auth.guard';
@@ -39,7 +39,7 @@ export class BlogsController {
   @UseGuards(BasicAuthGuard)
   @Post(':id/posts')
   async createPostForBlog(
-    @Body() dto: Omit<CreatePostInputDto, 'blogId'>,
+    @Body() dto: CreatePostForBlogInputDto,
     @Param() param: IdInputDto,
   ) {
     const postId = await this.postsService.createPostForBlog(dto, param.id);

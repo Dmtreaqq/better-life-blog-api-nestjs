@@ -26,3 +26,23 @@ export class CreatePostInputDto {
   @IsString()
   blogId: string;
 }
+
+export class CreatePostForBlogInputDto {
+  @MaxLength(30)
+  @IsNotEmpty()
+  @Trim()
+  @IsString()
+  title: string;
+
+  @MaxLength(100)
+  @IsNotEmpty()
+  @Trim()
+  @IsString()
+  shortDescription: string;
+
+  @MaxLength(1000)
+  @IsNotEmpty()
+  @Trim()
+  @IsString()
+  content: string;
+}
