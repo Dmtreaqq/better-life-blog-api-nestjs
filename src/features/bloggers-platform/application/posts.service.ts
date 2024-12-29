@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreatePostInputDto } from '../api/input-dto/create-post-input.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Post, PostModelType } from '../domain/post.entity';
@@ -44,7 +44,7 @@ export class PostsService {
   ): Promise<string> {
     const blog = await this.blogsRepository.getById(blogId);
     if (!blog) {
-      throw new BadRequestException([
+      throw new NotFoundException([
         {
           message: 'Blog not found',
           field: 'blogId',
