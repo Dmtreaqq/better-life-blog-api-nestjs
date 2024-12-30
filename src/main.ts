@@ -4,11 +4,14 @@ import { appSetup } from './settings/app.setup';
 import { CommonConfig } from './common/common.config';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const appContext = await NestFactory.createApplicationContext(AppModule);
+  const commonConfig = appContext.get<CommonConfig>(CommonConfig);
+  await appContext.close();
+  const dynamicAppModule = await AppModule.forRoot(commonConfig);
 
-  const commonConfig = app.get<CommonConfig>(CommonConfig);
+  const app = await NestFactory.create(dynamicAppModule);
+
   const port = commonConfig.port;
-
   appSetup(app, commonConfig);
 
   app.getHttpAdapter().getInstance().disable('x-powered-by');

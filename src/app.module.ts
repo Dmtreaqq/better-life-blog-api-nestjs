@@ -1,5 +1,5 @@
 import { configDynamicModule } from './config-dynamic-module';
-import { Module } from '@nestjs/common';
+import { DynamicModule, Module } from '@nestjs/common';
 import { BloggersPlatformModule } from './features/bloggers-platform/bloggers-platform.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Connection } from 'mongoose';
@@ -24,13 +24,26 @@ import { CommonConfig } from './common/common.config';
       },
       inject: [CommonConfig],
     }),
-    TestingModule,
     UserPlatformModule,
     BloggersPlatformModule,
-    // CommonModule,
+    CommonModule,
     configDynamicModule,
   ],
   controllers: [],
   providers: [],
 })
-export class AppModule {}
+export class AppModule {
+  static async forRoot(commonConfig: CommonConfig): Promise<DynamicModule> {
+    const additionalModules: any[] = [];
+
+    if (commonConfig.includeTestingModule) {
+      console.log('Testing Module Included');
+      additionalModules.push(TestingModule);
+    }
+
+    return {
+      module: AppModule,
+      imports: additionalModules,
+    };
+  }
+}
