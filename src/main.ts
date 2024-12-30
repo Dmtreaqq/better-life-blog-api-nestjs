@@ -12,7 +12,7 @@ async function bootstrap() {
   const app = await NestFactory.create(dynamicAppModule);
 
   const port = commonConfig.port;
-  appSetup(app, commonConfig);
+  await appSetup(app, commonConfig);
 
   app.getHttpAdapter().getInstance().disable('x-powered-by');
 

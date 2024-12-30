@@ -12,6 +12,7 @@ import { CreatePostInputDto } from '../../../../src/features/bloggers-platform/a
 import { TestingModule as TestModule } from '../../../../src/features/testing/testing.module';
 import { CommonConfig } from '../../../../src/common/common.config';
 import { basicAuthHeader } from '../../../helpers/users-test-manager';
+import { AppModule } from '../../../../src/app.module';
 
 describe('Blogs Positive (e2e)', () => {
   let app: INestApplication;
@@ -28,7 +29,7 @@ describe('Blogs Positive (e2e)', () => {
 
     app = moduleFixture.createNestApplication();
     const commonConfig = app.get(CommonConfig);
-    appSetup(app, commonConfig);
+    await appSetup(app, commonConfig);
     blogsTestManager = new BlogsTestManager(app);
 
     await app.init();

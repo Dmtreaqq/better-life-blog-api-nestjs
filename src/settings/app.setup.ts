@@ -7,11 +7,14 @@ import { CommonConfig } from '../common/common.config';
 import { cookieParserSetup } from './cookie-parser.setup';
 import { validatorConstraintSetup } from './validatorConstraint.setup';
 
-export function appSetup(app: INestApplication, commonConfig: CommonConfig) {
+export async function appSetup(
+  app: INestApplication,
+  commonConfig: CommonConfig,
+) {
   exceptionsFilterSetup(app, commonConfig);
   pipesSetup(app);
   globalPrefixSetup(app);
   swaggerSetup(app, commonConfig);
-  validatorConstraintSetup(app);
+  await validatorConstraintSetup(app, commonConfig);
   cookieParserSetup(app);
 }
