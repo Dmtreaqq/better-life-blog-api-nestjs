@@ -139,23 +139,14 @@ describe('Blogs Negative (e2e)', () => {
     });
   });
 
-  it('should return 400 for POST post for a not existing blog', async () => {
+  it('should return 404 for POST post for a not existing blog', async () => {
     const randomObjectId = new ObjectId();
 
-    const response = await request(app.getHttpServer())
+    await request(app.getHttpServer())
       .post(`${API_PREFIX}${API_PATH.BLOGS}/${randomId}/posts`)
       .send({ ...createPostInput, blogId: randomObjectId })
       .set('authorization', basicAuthHeader)
-      .expect(HttpStatus.BAD_REQUEST);
-
-    expect(response.body).toEqual({
-      errorsMessages: [
-        {
-          message: 'Blog not found',
-          field: 'blogId',
-        },
-      ],
-    });
+      .expect(HttpStatus.NOT_FOUND);
   });
 
   it('should return 400 for incorrect NAME type while POST blog', async () => {

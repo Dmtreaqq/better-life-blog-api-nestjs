@@ -8,6 +8,7 @@ export class JwtOptionalAuthGuard extends AuthGuard('jwt') {
   }
 
   handleRequest(err, user, info) {
+    // TODO: FIX OPTIONAL AUTH GUARD
     return user;
   }
 }

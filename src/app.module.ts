@@ -8,8 +8,6 @@ import { UserPlatformModule } from './features/user-platform/user-platform.modul
 import { CommonModule } from './common/common.module';
 import { CommonConfig } from './common/common.config';
 
-// TODO: вьінести время жизни токена в .env
-
 @Module({
   imports: [
     MongooseModule.forRootAsync({
@@ -29,7 +27,7 @@ import { CommonConfig } from './common/common.config';
     TestingModule,
     UserPlatformModule,
     BloggersPlatformModule,
-    CommonModule,
+    // CommonModule,
     configDynamicModule,
   ],
   controllers: [],
