@@ -1,18 +1,14 @@
 import { HttpStatus, INestApplication } from '@nestjs/common';
 import { MongoMemoryServer } from 'mongodb-memory-server';
-import { Test, TestingModule } from '@nestjs/testing';
-import { MongooseModule } from '@nestjs/mongoose';
-import { appSetup } from '../../../../src/settings/app.setup';
 import * as request from 'supertest';
 import { API_PREFIX } from '../../../../src/settings/global-prefix.setup';
 import { API_PATH } from '../../../../src/common/constants';
-import { TestingModule as TestModule } from '../../../../src/features/testing/testing.module';
 import {
   basicAuthHeader,
   UsersTestManager,
 } from '../../../helpers/users-test-manager';
 import { createUserInput } from '../../../helpers/inputs';
-import { CommonConfig } from '../../../../src/common/common.config';
+import { initSettings } from '../../../helpers/init-settings';
 
 describe('Users Positive (e2e)', () => {
   let app: INestApplication;
@@ -20,17 +16,10 @@ describe('Users Positive (e2e)', () => {
   let usersTestManager: UsersTestManager;
 
   beforeAll(async () => {
-    mongoServer = await MongoMemoryServer.create();
-    const mongoUri = mongoServer.getUri();
+    const result = await initSettings();
+    app = result.app;
 
-    const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [TestModule, MongooseModule.forRoot(mongoUri)],
-    }).compile();
-
-    app = moduleFixture.createNestApplication();
-    const commonConfig = app.get(CommonConfig);
-    appSetup(app, commonConfig);
-    usersTestManager = new UsersTestManager(app);
+    usersTestManager = result.usersTestManager;
 
     await app.init();
   });

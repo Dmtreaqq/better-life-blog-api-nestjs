@@ -6,14 +6,21 @@ import { Connection } from 'mongoose';
 import { TestingModule } from './features/testing/testing.module';
 import { UserPlatformModule } from './features/user-platform/user-platform.module';
 import { CommonModule } from './common/common.module';
-import { CommonConfig } from './common/common.config';
+import { CommonConfig, Environments } from './common/common.config';
+import { MongoMemoryServer } from 'mongodb-memory-server';
 
 @Module({
   imports: [
     MongooseModule.forRootAsync({
-      useFactory: (commonConfig: CommonConfig) => {
+      useFactory: async (commonConfig: CommonConfig) => {
+        let mongoUri = commonConfig.mongoUri;
+        if (commonConfig.env === Environments.Testing) {
+          const mongoServer = await MongoMemoryServer.create();
+          mongoUri = mongoServer.getUri();
+        }
+
         return {
-          uri: commonConfig.mongoUri,
+          uri: mongoUri,
           dbName: 'better-life-blog-nest',
           onConnectionCreate: (connection: Connection) => {
             connection.on('connected', () =>

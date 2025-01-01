@@ -1,43 +1,27 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { HttpStatus, INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
-import { MongoMemoryServer } from 'mongodb-memory-server';
-import { MongooseModule } from '@nestjs/mongoose';
 import { API_PATH } from '../../../../src/common/constants';
 import { API_PREFIX } from '../../../../src/settings/global-prefix.setup';
-import { appSetup } from '../../../../src/settings/app.setup';
 import { BlogsTestManager } from '../../../helpers/blogs-test-manager';
 import { UpdateBlogInput } from '../../../../src/features/bloggers-platform/api/input-dto/update-blog.dto';
 import { CreatePostInputDto } from '../../../../src/features/bloggers-platform/api/input-dto/create-post-input.dto';
-import { TestingModule as TestModule } from '../../../../src/features/testing/testing.module';
-import { CommonConfig } from '../../../../src/common/common.config';
 import { basicAuthHeader } from '../../../helpers/users-test-manager';
-import { AppModule } from '../../../../src/app.module';
+import { initSettings } from '../../../helpers/init-settings';
 
 describe('Blogs Positive (e2e)', () => {
   let app: INestApplication;
-  let mongoServer: MongoMemoryServer;
   let blogsTestManager: BlogsTestManager;
 
   beforeAll(async () => {
-    mongoServer = await MongoMemoryServer.create();
-    const mongoUri = mongoServer.getUri();
-
-    const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [TestModule, MongooseModule.forRoot(mongoUri)],
-    }).compile();
-
-    app = moduleFixture.createNestApplication();
-    const commonConfig = app.get(CommonConfig);
-    await appSetup(app, commonConfig);
-    blogsTestManager = new BlogsTestManager(app);
+    const result = await initSettings();
+    app = result.app;
+    blogsTestManager = result.blogsTestManager;
 
     await app.init();
   });
 
   afterAll(async () => {
     await app.close();
-    await mongoServer.stop();
   });
 
   beforeEach(async () => {

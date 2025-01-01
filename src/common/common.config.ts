@@ -10,7 +10,7 @@ import {
 } from 'class-validator';
 import { Trim } from './decorators/custom-trim.decorator';
 
-enum Environments {
+export enum Environments {
   Production = 'production',
   Development = 'development',
   Testing = 'testing',

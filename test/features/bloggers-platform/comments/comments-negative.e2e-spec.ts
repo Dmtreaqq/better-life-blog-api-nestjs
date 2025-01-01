@@ -19,6 +19,7 @@ import {
 import { CommentViewDto } from '../../../../src/features/bloggers-platform/api/view-dto/comment.view-dto';
 import { CommentsTestManager } from '../../../helpers/comments-test-manager';
 import { ObjectId } from 'mongodb';
+import { initSettings } from '../../../helpers/init-settings';
 
 const commentEntity: CommentViewDto = {
   id: '',
@@ -44,20 +45,12 @@ describe('Comments Negative (e2e)', () => {
   let commentsTestManager: CommentsTestManager;
 
   beforeAll(async () => {
-    mongoServer = await MongoMemoryServer.create();
-    const mongoUri = mongoServer.getUri();
-
-    const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [TestModule, MongooseModule.forRoot(mongoUri)],
-    }).compile();
-
-    app = moduleFixture.createNestApplication();
-    const commonConfig = app.get(CommonConfig);
-    appSetup(app, commonConfig);
-    blogsTestManager = new BlogsTestManager(app);
-    postsTestManager = new PostsTestManager(app);
-    usersTestManager = new UsersTestManager(app);
-    commentsTestManager = new CommentsTestManager(app);
+    const result = await initSettings();
+    app = result.app;
+    blogsTestManager = result.blogsTestManager;
+    postsTestManager = result.postsTestManager;
+    usersTestManager = result.usersTestManager;
+    commentsTestManager = result.commentsTestManager;
 
     await app.init();
   });

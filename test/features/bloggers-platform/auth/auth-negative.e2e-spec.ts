@@ -1,21 +1,13 @@
 import { HttpStatus, INestApplication } from '@nestjs/common';
 import { MongoMemoryServer } from 'mongodb-memory-server';
-import { Test, TestingModule } from '@nestjs/testing';
-import { MongooseModule } from '@nestjs/mongoose';
-import { appSetup } from '../../../../src/settings/app.setup';
 import * as request from 'supertest';
 import { API_PREFIX } from '../../../../src/settings/global-prefix.setup';
 import { API_PATH } from '../../../../src/common/constants';
-import { TestingModule as TestModule } from '../../../../src/features/testing/testing.module';
-import {
-  UsersTestManager,
-} from '../../../helpers/users-test-manager';
+import { UsersTestManager } from '../../../helpers/users-test-manager';
 import { createUserInput } from '../../../helpers/inputs';
-import { EmailService } from '../../../../src/features/communication/email.service';
-import { EmailServiceMock } from '../../../mock/email-service.mock';
 import { UsersRepository } from '../../../../src/features/user-platform/repositories/users.repository';
 import { sub } from 'date-fns/sub';
-import { CommonConfig } from '../../../../src/common/common.config';
+import { initSettings } from '../../../helpers/init-settings';
 
 describe('Auth Negative (e2e)', () => {
   let app: INestApplication;
@@ -24,22 +16,11 @@ describe('Auth Negative (e2e)', () => {
   let usersRepository: UsersRepository;
 
   beforeAll(async () => {
-    mongoServer = await MongoMemoryServer.create();
-    const mongoUri = mongoServer.getUri();
+    const result = await initSettings();
+    app = result.app;
 
-    const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [TestModule, MongooseModule.forRoot(mongoUri)],
-    })
-      .overrideProvider(EmailService)
-      .useClass(EmailServiceMock)
-      .compile();
-
-    app = moduleFixture.createNestApplication();
-    const commonConfig = app.get(CommonConfig);
-    appSetup(app, commonConfig);
-
-    usersTestManager = new UsersTestManager(app);
-    usersRepository = moduleFixture.get<UsersRepository>(UsersRepository);
+    usersTestManager = result.usersTestManager;
+    usersRepository = result.app.get<UsersRepository>(UsersRepository);
 
     await app.init();
   });
@@ -197,8 +178,10 @@ describe('Auth Negative (e2e)', () => {
 
   it('should return 400 when POST registration confirmation when code is expired', async () => {
     await usersTestManager.registerUser(createUserInput);
-    const user = await usersRepository.findByEmail(createUserInput.email)
-    user.confirmationCodeExpirationDate = sub(new Date(), { minutes: 4 }).toISOString()
+    const user = await usersRepository.findByEmail(createUserInput.email);
+    user.confirmationCodeExpirationDate = sub(new Date(), {
+      minutes: 4,
+    }).toISOString();
     await usersRepository.save(user);
 
     const response = await request(app.getHttpServer())

@@ -14,11 +14,6 @@ import { BlogsRepository } from '../repositories/blogs.repository';
 export class BlogIsExistConstraint implements ValidatorConstraintInterface {
   constructor(private readonly blogsRepository: BlogsRepository) {}
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  // validate(value: any, args: ValidationArguments) {
-  //   return this.blogsRepository.blogIsExist(value);
-  // }
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async validate(value: any, args?: ValidationArguments) {
     if (!isMongoId(value)) {
       return false;

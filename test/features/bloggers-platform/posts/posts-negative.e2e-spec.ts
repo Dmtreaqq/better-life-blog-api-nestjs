@@ -2,18 +2,13 @@ import { HttpStatus, INestApplication } from '@nestjs/common';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import { BlogsTestManager } from '../../../helpers/blogs-test-manager';
 import { PostsTestManager } from '../../../helpers/posts-test-manager';
-import { Test, TestingModule } from '@nestjs/testing';
-import { BloggersPlatformModule } from '../../../../src/features/bloggers-platform/bloggers-platform.module';
-import { MongooseModule } from '@nestjs/mongoose';
-import { appSetup } from '../../../../src/settings/app.setup';
 import * as request from 'supertest';
 import { API_PREFIX } from '../../../../src/settings/global-prefix.setup';
 import { API_PATH } from '../../../../src/common/constants';
 import { createBlogInput, createPostInput } from '../../../helpers/inputs';
-import { TestingModule as TestModule } from '../../../../src/features/testing/testing.module';
 import { ObjectId } from 'mongodb';
-import { CommonConfig } from '../../../../src/common/common.config';
 import { basicAuthHeader } from '../../../helpers/users-test-manager';
+import { initSettings } from '../../../helpers/init-settings';
 
 describe('Posts Negative (e2e)', () => {
   let app: INestApplication;
@@ -23,23 +18,11 @@ describe('Posts Negative (e2e)', () => {
   let randomObjectId: ObjectId;
 
   beforeAll(async () => {
-    mongoServer = await MongoMemoryServer.create();
-    const mongoUri = mongoServer.getUri();
     randomObjectId = new ObjectId();
-
-    const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [
-        BloggersPlatformModule,
-        TestModule,
-        MongooseModule.forRoot(mongoUri),
-      ],
-    }).compile();
-
-    app = moduleFixture.createNestApplication();
-    const commonConfig = app.get(CommonConfig);
-    appSetup(app, commonConfig);
-    blogsTestManager = new BlogsTestManager(app);
-    postsTestManager = new PostsTestManager(app);
+    const result = await initSettings();
+    app = result.app;
+    blogsTestManager = result.blogsTestManager;
+    postsTestManager = result.postsTestManager;
 
     await app.init();
   });
