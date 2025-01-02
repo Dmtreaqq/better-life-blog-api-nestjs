@@ -12,7 +12,6 @@ import { LocalStrategy } from './api/guards/local.strategy';
 import { AuthController } from './api/auth.controller';
 import { JwtModule } from '@nestjs/jwt';
 import { CommunicationModule } from '../communication/communication.module';
-import { CommonConfig } from '../../common/common.config';
 import { UserPlatformConfig } from './config/user-platform.config';
 
 // TODO: спросить почему мьі добавили паспорт модуль
@@ -20,21 +19,22 @@ import { UserPlatformConfig } from './config/user-platform.config';
   imports: [
     CommunicationModule,
     PassportModule,
-    JwtModule.registerAsync({
-      useFactory: (
-        commonConfig: CommonConfig,
-        userPlatformConfig: UserPlatformConfig,
-      ) => {
-        return {
-          secret: commonConfig.accessTokenSecret,
-          signOptions: {
-            expiresIn: `${userPlatformConfig.accessTokenExpiration}m`,
-          },
-        };
-      },
-      inject: [CommonConfig, UserPlatformConfig],
-      extraProviders: [UserPlatformConfig],
-    }),
+    JwtModule.register({}),
+    // JwtModule.registerAsync({
+    //   useFactory: (
+    //     commonConfig: CommonConfig,
+    //     userPlatformConfig: UserPlatformConfig,
+    //   ) => {
+    //     return {
+    //       secret: commonConfig.accessTokenSecret,
+    //       signOptions: {
+    //         expiresIn: `${userPlatformConfig.accessTokenExpiration}m`,
+    //       },
+    //     };
+    //   },
+    //   inject: [CommonConfig, UserPlatformConfig],
+    //   extraProviders: [UserPlatformConfig],
+    // }),
     MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
   ],
   controllers: [UsersController, AuthController],
@@ -45,6 +45,7 @@ import { UserPlatformConfig } from './config/user-platform.config';
     CryptoService,
     AuthService,
     LocalStrategy,
+    UserPlatformConfig,
   ],
   exports: [MongooseModule, UsersRepository],
 })

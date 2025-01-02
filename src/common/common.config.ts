@@ -52,6 +52,11 @@ export class CommonConfig {
   @IsString({ message: 'JWT_SECRET should be a string' })
   accessTokenSecret: string = this.configService.get('JWT_SECRET');
 
+  @IsNotEmpty({ message: 'REFRESH_SECRET should not be empty' })
+  @Trim()
+  @IsString({ message: 'REFRESH_SECRET should be a string' })
+  refreshTokenSecret: string = this.configService.get('REFRESH_SECRET');
+
   @IsNotEmpty({ message: 'BASIC_LOGIN should be not empty' })
   @Trim()
   @IsString({ message: 'BASIC_LOGIN should be a string' })

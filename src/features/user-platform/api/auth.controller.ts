@@ -38,8 +38,7 @@ export class AuthController {
     @GetUser() userContext: UserContext,
   ) {
     const loginResult = await this.authService.login(userContext.id);
-    // TODO: change to refresh token form Login Result
-    res.cookie('refreshToken', loginResult.accessToken, {
+    res.cookie('refreshToken', loginResult.refreshToken, {
       httpOnly: true,
       secure: true,
       expires: add(new Date(), { hours: 24 }),

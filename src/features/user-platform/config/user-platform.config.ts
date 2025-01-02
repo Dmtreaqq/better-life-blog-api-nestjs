@@ -14,4 +14,10 @@ export class UserPlatformConfig {
   accessTokenExpiration: number = Number(
     this.configService.get('ACCESS_TOKEN_EXPIRATION'),
   );
+
+  @IsNumber({}, { message: 'REFRESH_TOKEN_EXPIRATION should be a number' })
+  @IsNotEmpty({ message: 'REFRESH_TOKEN_EXPIRATION should not be empty' })
+  refreshTokenExpiration: number = Number(
+    this.configService.get('REFRESH_TOKEN_EXPIRATION'),
+  );
 }

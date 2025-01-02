@@ -16,6 +16,8 @@ import { ConfirmationCodeDto } from '../api/input-dto/confirmation-code.dto';
 import { EmailService } from '../../communication/email.service';
 import { EmailDto } from '../api/input-dto/email.dto';
 import { ConfirmNewPasswordDto } from '../api/input-dto/confirm-new-password.dto';
+import { CommonConfig } from '../../../common/common.config';
+import { UserPlatformConfig } from '../config/user-platform.config';
 
 @Injectable()
 export class AuthService {
@@ -26,12 +28,23 @@ export class AuthService {
     private cryptoService: CryptoService,
     private jwtService: JwtService,
     private emailService: EmailService,
+    private commonConfig: CommonConfig,
+    private userPlatformConfig: UserPlatformConfig,
   ) {}
 
-  async login(userId: string) {
+  async login(
+    userId: string,
+  ): Promise<{ accessToken: string; refreshToken: string }> {
     const payload = { id: userId } as UserContext;
     return {
-      accessToken: this.jwtService.sign(payload),
+      accessToken: await this.jwtService.signAsync(payload, {
+        secret: this.commonConfig.accessTokenSecret,
+        expiresIn: this.userPlatformConfig.accessTokenExpiration + 'm',
+      }),
+      refreshToken: await this.jwtService.signAsync(payload, {
+        secret: this.commonConfig.refreshTokenSecret,
+        expiresIn: this.userPlatformConfig.refreshTokenExpiration + 'm',
+      }),
     };
   }
 
