@@ -13,6 +13,10 @@ import { AuthController } from './api/auth.controller';
 import { JwtModule } from '@nestjs/jwt';
 import { CommunicationModule } from '../communication/communication.module';
 import { UserPlatformConfig } from './config/user-platform.config';
+import {
+  UserDeviceSession,
+  UserDeviceSessionSchema,
+} from './domain/user-device-session';
 
 // TODO: спросить почему мьі добавили паспорт модуль
 @Module({
@@ -35,7 +39,10 @@ import { UserPlatformConfig } from './config/user-platform.config';
     //   inject: [CommonConfig, UserPlatformConfig],
     //   extraProviders: [UserPlatformConfig],
     // }),
-    MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
+    MongooseModule.forFeature([
+      { name: User.name, schema: UserSchema },
+      { name: UserDeviceSession.name, schema: UserDeviceSessionSchema },
+    ]),
   ],
   controllers: [UsersController, AuthController],
   providers: [
