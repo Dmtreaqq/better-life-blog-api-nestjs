@@ -22,6 +22,12 @@ export class UserDeviceSessionsRepository {
     return this.UserDeviceSessionModel.findById(id);
   }
 
+  async findByDeviceId(deviceId: string): Promise<UserDeviceSessionDocument> {
+    return this.UserDeviceSessionModel.findOne({
+      deviceId,
+    });
+  }
+
   async findByDeviceIdAndUserId(
     deviceId: string,
     userId: string,
@@ -29,6 +35,13 @@ export class UserDeviceSessionsRepository {
     return this.UserDeviceSessionModel.findOne({
       deviceId,
       userId,
+    });
+  }
+
+  async deleteManyExcept(deviceId: string, userId: string) {
+    await this.UserDeviceSessionModel.deleteMany({
+      userId: userId,
+      deviceId: { $ne: deviceId },
     });
   }
 

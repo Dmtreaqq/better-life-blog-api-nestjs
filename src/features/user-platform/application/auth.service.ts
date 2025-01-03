@@ -308,6 +308,6 @@ export class AuthService {
     //   userId: string;
     // }>(refreshToken);
 
-    await this.userDeviceSessionsService.deleteDeviceSession(deviceId, userId);
+    await this.userDeviceSessionsService.deleteCurrentDeviceSession(deviceId, userId);
   }
 }

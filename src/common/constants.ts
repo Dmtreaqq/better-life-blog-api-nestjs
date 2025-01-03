@@ -5,4 +5,5 @@ export enum API_PATH {
   USERS = '/users',
   AUTH = '/auth',
   COMMENTS = '/comments',
+  SECURITY = '/security',
 }

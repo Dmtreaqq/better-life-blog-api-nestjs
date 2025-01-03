@@ -1,4 +1,9 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { UserDeviceSessionsRepository } from '../repositories/user-device-sessions.repository';
 import { CreateDeviceSessionDto } from '../dto/create-device-session.dto';
 import { InjectModel } from '@nestjs/mongoose';
@@ -45,7 +50,7 @@ export class UserDeviceSessionsService {
     await this.userDeviceSessionsRepository.save(session);
   }
 
-  async deleteDeviceSession(deviceId: string, userId: string) {
+  async deleteCurrentDeviceSession(deviceId: string, userId: string) {
     const session =
       await this.userDeviceSessionsRepository.findByDeviceIdAndUserId(
         deviceId,
@@ -56,6 +61,27 @@ export class UserDeviceSessionsService {
       throw new UnauthorizedException(
         `There is no session with deviceId: ${deviceId} and userId: ${userId}`,
       );
+    }
+
+    await this.userDeviceSessionsRepository.delete(session);
+  }
+
+  async deleteAllDeviceSessionExceptCurrent(deviceId: string, userId: string) {
+    await this.userDeviceSessionsRepository.deleteManyExcept(deviceId, userId);
+  }
+
+  async deleteSpecificDeviceSession(deviceId: string, userId: string) {
+    const session =
+      await this.userDeviceSessionsRepository.findByDeviceId(deviceId);
+
+    if (!session) {
+      throw new NotFoundException(
+        `There is no session with deviceId: ${deviceId}`,
+      );
+    }
+
+    if (session.userId !== userId) {
+      throw new ForbiddenException();
     }
 
     await this.userDeviceSessionsRepository.delete(session);

@@ -56,6 +56,22 @@ export class UsersTestManager {
     };
   }
 
+  async loginWithUserAgent(email: string, password: string, userAgent: string) {
+    const response = await request(this.app.getHttpServer())
+      .post(API_PREFIX + API_PATH.AUTH + '/login')
+      .set('user-agent', userAgent)
+      .send({
+        loginOrEmail: email,
+        password,
+      });
+    console.log(response.headers);
+
+    return {
+      accessToken: response.body.accessToken,
+      refreshToken: response.headers['set-cookie'][0],
+    };
+  }
+
   async me(
     accessToken: string,
     statusCode: number = HttpStatus.OK,

@@ -19,6 +19,8 @@ import {
 } from './domain/user-device-session.entity';
 import { UserDeviceSessionsService } from './application/user-device-sessions.service';
 import { UserDeviceSessionsRepository } from './repositories/user-device-sessions.repository';
+import { SecurityDevicesController } from './api/security-devices.controller';
+import { UserDeviceSessionsQueryRepository } from './repositories/query/user-device-sessions.query-repository';
 
 // TODO: спросить почему мьі добавили паспорт модуль
 @Module({
@@ -46,7 +48,7 @@ import { UserDeviceSessionsRepository } from './repositories/user-device-session
       { name: UserDeviceSession.name, schema: UserDeviceSessionSchema },
     ]),
   ],
-  controllers: [UsersController, AuthController],
+  controllers: [UsersController, AuthController, SecurityDevicesController],
   providers: [
     UsersService,
     UsersRepository,
@@ -57,6 +59,7 @@ import { UserDeviceSessionsRepository } from './repositories/user-device-session
     UserPlatformConfig,
     UserDeviceSessionsService,
     UserDeviceSessionsRepository,
+    UserDeviceSessionsQueryRepository,
   ],
   exports: [MongooseModule, UsersRepository, UserDeviceSessionsService],
 })
