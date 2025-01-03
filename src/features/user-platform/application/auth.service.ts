@@ -267,4 +267,13 @@ export class AuthService {
 
     throw new UnauthorizedException();
   }
+
+  async logout(deviceId: string, userId: string) {
+    // const decodedToken = this.jwtService.decode<{
+    //   deviceId: string;
+    //   userId: string;
+    // }>(refreshToken);
+
+    await this.userDeviceSessionsService.deleteDeviceSession(deviceId, userId);
+  }
 }

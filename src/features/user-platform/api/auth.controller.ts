@@ -25,12 +25,14 @@ import { Response } from 'express';
 import { add } from 'date-fns/add';
 import { JwtRefreshAuthGuard } from '../../../common/guards/jwt-refresh-auth.guard';
 import { UserAgent } from '../../../common/decorators/user-agent.decorator';
+import { UserDeviceSessionsService } from '../application/user-device-sessions.service';
 
 @Controller('auth')
 export class AuthController {
   constructor(
     private authService: AuthService,
     private usersQueryRepository: UsersQueryRepository,
+    private userDeviceSessionsService: UserDeviceSessionsService,
   ) {}
 
   @UseGuards(LocalAuthGuard)
@@ -73,8 +75,17 @@ export class AuthController {
   @UseGuards(JwtRefreshAuthGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   @Post('logout')
-  async logout() {
-    // TODO: delete session
+  async logout(
+    @GetUser() userContext: { deviceId: string; id: string },
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    await this.authService.logout(userContext.deviceId, userContext.id);
+
+    res.clearCookie('refreshToken', {
+      httpOnly: true,
+      secure: true,
+      expires: add(new Date(), { hours: 24 }),
+    });
   }
 
   @UseGuards(JwtRefreshAuthGuard)
