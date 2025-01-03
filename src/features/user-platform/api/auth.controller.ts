@@ -4,6 +4,7 @@ import {
   Get,
   HttpCode,
   HttpStatus,
+  Ip,
   Post,
   Res,
   UseGuards,
@@ -23,6 +24,7 @@ import { UserContext } from '../../../common/dto/user-context.dto';
 import { Response } from 'express';
 import { add } from 'date-fns/add';
 import { JwtRefreshAuthGuard } from '../../../common/guards/jwt-refresh-auth.guard';
+import { UserAgent } from '../../../common/decorators/user-agent.decorator';
 
 @Controller('auth')
 export class AuthController {
@@ -35,17 +37,21 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   @Post('login')
   async login(
+    @Ip() ip: string,
+    @UserAgent() userAgent: string,
     @Res({ passthrough: true }) res: Response,
     @GetUser() userContext: UserContext,
   ) {
-    const loginResult = await this.authService.login(userContext.id);
+    const loginResult = await this.authService.login(
+      userContext.id,
+      ip,
+      userAgent,
+    );
     res.cookie('refreshToken', loginResult.refreshToken, {
       httpOnly: true,
       secure: true,
       expires: add(new Date(), { hours: 24 }),
     });
-
-    // TODO: create session
 
     return {
       accessToken: loginResult.accessToken,

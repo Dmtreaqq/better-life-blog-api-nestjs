@@ -5,7 +5,6 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { Document } from 'mongoose';
 
 @Injectable()
 export class UsersRepository {

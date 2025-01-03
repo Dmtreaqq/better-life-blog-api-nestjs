@@ -18,6 +18,8 @@ import { EmailDto } from '../api/input-dto/email.dto';
 import { ConfirmNewPasswordDto } from '../api/input-dto/confirm-new-password.dto';
 import { CommonConfig } from '../../../common/common.config';
 import { UserPlatformConfig } from '../config/user-platform.config';
+import { UserDeviceSessionsService } from './user-device-sessions.service';
+import { JwtPayload } from 'jsonwebtoken';
 
 @Injectable()
 export class AuthService {
@@ -30,22 +32,47 @@ export class AuthService {
     private emailService: EmailService,
     private commonConfig: CommonConfig,
     private userPlatformConfig: UserPlatformConfig,
+    private userDeviceSessionsService: UserDeviceSessionsService,
   ) {}
 
   async login(
     userId: string,
+    ip: string,
+    userAgent: string,
   ): Promise<{ accessToken: string; refreshToken: string }> {
     const payload = { id: userId } as UserContext;
-    return {
+
+    const deviceId = randomUUID();
+
+    const tokens = {
       accessToken: await this.jwtService.signAsync(payload, {
         secret: this.commonConfig.accessTokenSecret,
-        expiresIn: this.userPlatformConfig.accessTokenExpiration + 'm',
+        expiresIn: this.userPlatformConfig.accessTokenExpiration + 's',
       }),
-      refreshToken: await this.jwtService.signAsync(payload, {
-        secret: this.commonConfig.refreshTokenSecret,
-        expiresIn: this.userPlatformConfig.refreshTokenExpiration + 'm',
-      }),
+      refreshToken: await this.jwtService.signAsync(
+        { ...payload, deviceId, version: randomUUID() + 1 },
+        {
+          secret: this.commonConfig.refreshTokenSecret,
+          expiresIn: this.userPlatformConfig.refreshTokenExpiration + 's',
+        },
+      ),
     };
+
+    // START SESSION
+    const decodedRefreshToken = this.jwtService.decode<JwtPayload>(
+      tokens.refreshToken,
+    );
+
+    await this.userDeviceSessionsService.createDeviceSession({
+      userId,
+      deviceId,
+      ip: ip ?? 'Unknown Ip',
+      issuedAt: decodedRefreshToken.iat,
+      expirationDate: decodedRefreshToken.exp,
+      deviceName: userAgent ?? 'Unknown name',
+    });
+
+    return tokens;
   }
 
   async register(dto: RegistrationUserDto) {

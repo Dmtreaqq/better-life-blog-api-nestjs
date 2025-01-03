@@ -16,7 +16,9 @@ import { UserPlatformConfig } from './config/user-platform.config';
 import {
   UserDeviceSession,
   UserDeviceSessionSchema,
-} from './domain/user-device-session';
+} from './domain/user-device-session.entity';
+import { UserDeviceSessionsService } from './application/user-device-sessions.service';
+import { UserDeviceSessionsRepository } from './repositories/user-device-sessions.repository';
 
 // TODO: спросить почему мьі добавили паспорт модуль
 @Module({
@@ -53,7 +55,9 @@ import {
     AuthService,
     LocalStrategy,
     UserPlatformConfig,
+    UserDeviceSessionsService,
+    UserDeviceSessionsRepository,
   ],
-  exports: [MongooseModule, UsersRepository],
+  exports: [MongooseModule, UsersRepository, UserDeviceSessionsService],
 })
 export class UserPlatformModule {}
