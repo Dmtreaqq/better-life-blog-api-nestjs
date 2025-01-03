@@ -32,7 +32,6 @@ export class AuthController {
   constructor(
     private authService: AuthService,
     private usersQueryRepository: UsersQueryRepository,
-    private userDeviceSessionsService: UserDeviceSessionsService,
   ) {}
 
   @UseGuards(LocalAuthGuard)
@@ -91,8 +90,22 @@ export class AuthController {
   @UseGuards(JwtRefreshAuthGuard)
   @HttpCode(HttpStatus.OK)
   @Post('refresh-token')
-  async refreshToken() {
-    // TODO: delete session
+  async refreshToken(
+    @GetUser() userContext: { id: string; deviceId: string },
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const tokens = await this.authService.refreshTokensPair(
+      userContext.deviceId,
+      userContext.id,
+    );
+
+    res.cookie('refreshToken', tokens.refreshToken, {
+      httpOnly: true,
+      secure: true,
+      expires: add(new Date(), { hours: 24 }),
+    });
+
+    return tokens;
   }
 
   @HttpCode(HttpStatus.NO_CONTENT)

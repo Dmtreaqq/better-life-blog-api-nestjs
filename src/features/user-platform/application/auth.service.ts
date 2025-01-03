@@ -75,6 +75,40 @@ export class AuthService {
     return tokens;
   }
 
+  async refreshTokensPair(
+    deviceId: string,
+    userId: string,
+  ): Promise<{ accessToken: string; refreshToken: string }> {
+    const payload = { id: userId } as UserContext;
+
+    const tokens = {
+      accessToken: await this.jwtService.signAsync(payload, {
+        secret: this.commonConfig.accessTokenSecret,
+        expiresIn: this.userPlatformConfig.accessTokenExpiration + 's',
+      }),
+      refreshToken: await this.jwtService.signAsync(
+        { ...payload, deviceId, version: randomUUID() + 1 },
+        {
+          secret: this.commonConfig.refreshTokenSecret,
+          expiresIn: this.userPlatformConfig.refreshTokenExpiration + 's',
+        },
+      ),
+    };
+
+    const { iat, exp } = this.jwtService.decode<JwtPayload>(
+      tokens.refreshToken,
+    );
+
+    await this.userDeviceSessionsService.updateDeviceSession(
+      deviceId,
+      userId,
+      iat,
+      exp,
+    );
+
+    return tokens;
+  }
+
   async register(dto: RegistrationUserDto) {
     const isUserExist = await this.usersRepository.findByLoginOrEmail(
       dto.login,

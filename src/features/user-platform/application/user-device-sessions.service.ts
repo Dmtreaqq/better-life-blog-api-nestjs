@@ -21,6 +21,30 @@ export class UserDeviceSessionsService {
     await this.userDeviceSessionsRepository.save(instance);
   }
 
+  async updateDeviceSession(
+    deviceId: string,
+    userId: string,
+    newIat: number,
+    newExp: number,
+  ) {
+    const session =
+      await this.userDeviceSessionsRepository.findByDeviceIdAndUserId(
+        deviceId,
+        userId,
+      );
+
+    if (!session) {
+      throw new UnauthorizedException(
+        `There is no session with deviceId: ${deviceId} and userId: ${userId}`,
+      );
+    }
+
+    session.issuedAt = newIat;
+    session.expirationDate = newExp;
+
+    await this.userDeviceSessionsRepository.save(session);
+  }
+
   async deleteDeviceSession(deviceId: string, userId: string) {
     const session =
       await this.userDeviceSessionsRepository.findByDeviceIdAndUserId(
