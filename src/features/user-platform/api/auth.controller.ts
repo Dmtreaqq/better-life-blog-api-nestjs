@@ -22,6 +22,7 @@ import { GetUser } from '../../../common/decorators/get-user.decorator';
 import { UserContext } from '../../../common/dto/user-context.dto';
 import { Response } from 'express';
 import { add } from 'date-fns/add';
+import { JwtRefreshAuthGuard } from '../../../common/guards/jwt-refresh-auth.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -43,6 +44,9 @@ export class AuthController {
       secure: true,
       expires: add(new Date(), { hours: 24 }),
     });
+
+    // TODO: create session
+
     return {
       accessToken: loginResult.accessToken,
     };
@@ -58,6 +62,20 @@ export class AuthController {
   @Post('registration-confirmation')
   async confirmRegistration(@Body() dto: ConfirmationCodeDto) {
     await this.authService.confirmRegistration(dto);
+  }
+
+  @UseGuards(JwtRefreshAuthGuard)
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @Post('logout')
+  async logout() {
+    // TODO: delete session
+  }
+
+  @UseGuards(JwtRefreshAuthGuard)
+  @HttpCode(HttpStatus.OK)
+  @Post('refresh-token')
+  async refreshToken() {
+    // TODO: delete session
   }
 
   @HttpCode(HttpStatus.NO_CONTENT)
